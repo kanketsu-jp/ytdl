@@ -1,0 +1,16 @@
+{
+  "port": 80,
+  "baseURL": "",
+  "address": "",
+  "log": "stdout",
+  "database": "/database.db",
+  "root": "/srv",
+  "auth": {
+    "method": "json",
+    "header": ""
+  },
+  "branding": {
+    "name": "ytdl Media Server",
+    "disableExternal": false
+  }
+}
