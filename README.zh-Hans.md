@@ -1,0 +1,134 @@
+# ytdl
+
+> 🇺🇸 English | 🇯🇵 日本語 | 🇨🇳 **简体中文** | 🇪🇸 Español | 🇮🇳 हिन्दी | 🇧🇷 Português | 🇮🇩 Bahasa Indonesia
+
+基于 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 的媒体获取 CLI 工具。交互式 UI + AI 原生（Claude Code 插件）。
+
+## 合规与法律声明
+
+本项目是通用媒体获取工具。
+
+仅适用于以下内容：
+- 您拥有版权的内容
+- 公共许可（如 Creative Commons）内容
+- 平台明确允许下载的内容
+
+用户有责任遵守版权法和各平台的服务条款。本项目**不**鼓励或支持未经许可下载受版权保护的内容。
+
+## 禁止用途
+
+- 未经许可下载受版权保护的内容
+- 未经授权下载付费或订阅内容
+- 再分发下载的媒体
+- 规避 DRM 或技术保护措施
+
+## 允许用途
+
+- 备份您自己上传的内容
+- 离线处理您拥有权利的媒体
+- 归档 Creative Commons / 公共领域内容
+- 拥有适当权利的教育和研究目的
+
+## 安装
+
+```bash
+npm install -g @kanketsu/ytdl
+```
+
+需要 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 和 [ffmpeg](https://ffmpeg.org/)。首次运行时，如果未安装，ytdl 会提供自动安装。手动安装：
+
+```bash
+brew install yt-dlp ffmpeg
+```
+
+### 语言设置
+
+默认 UI 语言为日语。切换为中文：
+
+```bash
+# 环境变量
+YTDL_LANG=zh-Hans ytdl
+
+# CLI 参数
+ytdl --lang zh-Hans "URL"
+```
+
+## 使用方法
+
+### 交互模式
+
+不带参数运行 — 逐步选择：
+
+```bash
+ytdl
+```
+
+### 命令模式
+
+```bash
+ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"                 # 最高画质 + 缩略图 + 字幕 + 描述
+ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"              # 仅音频 (m4a)
+ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc"          # 720p
+ytdl -p "https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf" # 播放列表
+ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"              # 仅信息
+ytdl -a -o ~/Music "https://www.youtube.com/watch?v=BaW_jenozKc"   # 音频保存到 ~/Music
+ytdl "URL" -- --limit-rate 1M                                       # 传递 yt-dlp 选项
+```
+
+## 选项
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `-a` | 仅音频（m4a） | off |
+| `-q <分辨率>` | 画质（360/480/720/1080/1440/2160） | 最高 |
+| `-o <目录>` | 输出目录 | `~/Downloads` |
+| `-p` | 播放列表模式 | off |
+| `-b <浏览器>` | Cookie 浏览器 | off |
+| `-n` | 不使用 Cookie（默认） | on |
+| `-i` | 仅信息 | off |
+| `--lang <code>` | 语言（`ja`/`en`/`zh-Hans`/`es`/`hi`/`pt`/`id`） | `ja` |
+| `--` | 传递给 yt-dlp | - |
+
+默认不使用浏览器 Cookie。对于受限内容（年龄限制、会员专属等），请使用 `-b <浏览器>`。
+
+## 输出结构
+
+```
+~/Downloads/
+  └── 频道名/
+      └── 标题/
+          ├── 标题.mp4
+          ├── 标题.jpg           # 缩略图
+          ├── 标题.zh-Hans.srt   # 字幕
+          └── 标题.description   # 描述
+```
+
+---
+
+## Claude Code 插件
+
+将 ytdl 作为 Claude Code 技能使用。Claude 会通过 AskUserQuestion 交互式确认下载内容。
+
+### 安装
+
+```
+/plugin marketplace add kanketsu-jp/ytdl
+/plugin install ytdl@kanketsu-jp-ytdl
+```
+
+### 使用方法
+
+在 Claude Code 对话中粘贴媒体 URL 或说"下载这个"。技能会自动激活：
+
+1. 检查 `ytdl` 是否已安装（未安装则提示安装）
+2. 获取媒体信息
+3. 询问您的需求（视频/音频、画质、保存位置）
+4. 执行下载
+
+## 免责声明
+
+本软件仅供合法使用。作者不对任何滥用行为负责。
+
+## 许可证
+
+MIT

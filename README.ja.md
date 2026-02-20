@@ -1,8 +1,8 @@
 # ytdl
 
-[yt-dlp](https://github.com/yt-dlp/yt-dlp) ベースのメディア取得 CLI。インタラクティブ UI + AI ネイティブ（Claude Code プラグイン）。
+> 🇺🇸 English | 🇯🇵 **日本語** | 🇨🇳 简体中文 | 🇪🇸 Español | 🇮🇳 हिन्दी | 🇧🇷 Português | 🇮🇩 Bahasa Indonesia
 
-> [English is here](./README.md)
+[yt-dlp](https://github.com/yt-dlp/yt-dlp) ベースのメディア取得 CLI。インタラクティブ UI + AI ネイティブ（Claude Code プラグイン）。
 
 ## コンプライアンス・法的事項
 
@@ -86,7 +86,7 @@ ytdl "URL" -- --limit-rate 1M                                       # yt-dlpオ�
 | `-b <ブラウザ>` | クッキー取得元 | off |
 | `-n` | クッキーなし（デフォルト） | on |
 | `-i` | 情報のみ | off |
-| `--lang <code>` | 言語（`ja` / `en`） | `ja` |
+| `--lang <code>` | 言語（`ja`/`en`/`zh-Hans`/`es`/`hi`/`pt`/`id`） | `ja` |
 | `--` | 以降をyt-dlpに渡す | - |
 
 デフォルトではブラウザのクッキーを使いません。制限付きコンテンツ（年齢制限、メンバー限定等）には `-b <ブラウザ>` を使用してください。

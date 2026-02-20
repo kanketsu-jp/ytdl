@@ -1,8 +1,8 @@
 # ytdl
 
-A developer-oriented media retrieval CLI built on [yt-dlp](https://github.com/yt-dlp/yt-dlp). Interactive UI + AI-native (Claude Code plugin).
+> 🇺🇸 English | **日本語** | 简体中文 | Español | हिन्दी | Português | Bahasa Indonesia
 
-> [日本語はこちら](./README.ja.md)
+A developer-oriented media retrieval CLI built on [yt-dlp](https://github.com/yt-dlp/yt-dlp). Interactive UI + AI-native (Claude Code plugin).
 
 ## Compliance & Legal Notice
 
@@ -86,7 +86,7 @@ ytdl "URL" -- --limit-rate 1M                                       # pass yt-dl
 | `-b <browser>` | Cookie browser | off |
 | `-n` | No cookies (default) | on |
 | `-i` | Info only | off |
-| `--lang <code>` | Language (`ja` / `en`) | `ja` |
+| `--lang <code>` | Language (`ja`/`en`/`zh-Hans`/`es`/`hi`/`pt`/`id`) | `ja` |
 | `--` | Pass to yt-dlp | - |
 
 By default, ytdl runs without browser cookies. Use `-b <browser>` for restricted content (age-restricted, member-only, etc.).
