@@ -113,7 +113,7 @@ Use ytdl as a Claude Code skill. Claude will interactively ask what to retrieve 
 
 ```
 /plugin marketplace add kanketsu-jp/ytdl
-/plugin install ytdl@kanketsu-jp-ytdl
+/plugin install ytdl@kanketsu-ytdl
 ```
 
 ### Usage

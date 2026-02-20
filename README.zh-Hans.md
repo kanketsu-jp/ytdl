@@ -113,7 +113,7 @@ ytdl "URL" -- --limit-rate 1M                                       # 传递 yt-
 
 ```
 /plugin marketplace add kanketsu-jp/ytdl
-/plugin install ytdl@kanketsu-jp-ytdl
+/plugin install ytdl@kanketsu-ytdl
 ```
 
 ### 使用方法

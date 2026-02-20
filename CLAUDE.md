@@ -51,7 +51,7 @@ docker/
 
 ```
 /plugin marketplace add kanketsu-jp/ytdl
-/plugin install ytdl@kanketsu-jp-ytdl
+/plugin install ytdl@kanketsu-ytdl
 ```
 
 ## Command Interface

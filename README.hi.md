@@ -113,7 +113,7 @@ ytdl को Claude Code स्किल के रूप में उपयो�
 
 ```
 /plugin marketplace add kanketsu-jp/ytdl
-/plugin install ytdl@kanketsu-jp-ytdl
+/plugin install ytdl@kanketsu-ytdl
 ```
 
 ### उपयोग

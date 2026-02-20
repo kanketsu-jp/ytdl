@@ -113,7 +113,7 @@ Gunakan ytdl sebagai skill Claude Code. Claude akan bertanya secara interaktif a
 
 ```
 /plugin marketplace add kanketsu-jp/ytdl
-/plugin install ytdl@kanketsu-jp-ytdl
+/plugin install ytdl@kanketsu-ytdl
 ```
 
 ### Penggunaan

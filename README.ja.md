@@ -113,7 +113,7 @@ ytdl を Claude Code のスキルとして使える。Claude が AskUserQuestion
 
 ```
 /plugin marketplace add kanketsu-jp/ytdl
-/plugin install ytdl@kanketsu-jp-ytdl
+/plugin install ytdl@kanketsu-ytdl
 ```
 
 ### 使い方
