@@ -77,6 +77,8 @@ if [[ "$LANG_CODE" == "en" ]]; then
   L_COOKIE_NONE="none"
   L_EXTRA="Extra args:"
   L_DONE="Download complete"
+  L_ERR_DOWNLOAD="Download failed (exit code:"
+  L_ERR_DOWNLOAD_CLOSE=")"
 else
   L_ERROR_YTDLP="エラー: yt-dlp が見つかりません"
   L_INSTALL_YTDLP="brew install yt-dlp  でインストールしてください"
@@ -128,6 +130,8 @@ else
   L_COOKIE_NONE="なし"
   L_EXTRA="追加引数:"
   L_DONE="ダウンロード完了"
+  L_ERR_DOWNLOAD="ダウンロード失敗（終了コード:"
+  L_ERR_DOWNLOAD_CLOSE="）"
 fi
 
 # --- yt-dlp existence check ---
@@ -151,7 +155,7 @@ show_help() {
   echo "  ${G}-q${N} <res>       ${L_OPT_Q}"
   echo "  ${G}-o${N} <dir>       ${L_OPT_O}  ${D}[~/Downloads]${N}"
   echo "  ${G}-p${N}             ${L_OPT_P}"
-  echo "  ${G}-b${N} <browser>   ${L_OPT_B}  ${D}[chrome]${N}"
+  echo "  ${G}-b${N} <browser>   ${L_OPT_B}  ${D}[off]${N}"
   echo "  ${G}-n${N}             ${L_OPT_N}"
   echo "  ${G}-i${N}             ${L_OPT_I}"
   echo "  ${G}-h${N}             ${L_OPT_H}"
@@ -173,7 +177,7 @@ QUALITY=""
 BASE_DIR="$HOME/Downloads"
 PLAYLIST_MODE=false
 BROWSER="chrome"
-NO_COOKIE=false
+NO_COOKIE=true
 INFO_ONLY=false
 URL=""
 EXTRA_ARGS=()
@@ -205,6 +209,7 @@ while [[ $# -gt 0 ]]; do
         chrome|firefox|edge|safari|opera|brave|chromium|vivaldi) BROWSER="$2" ;;
         *) echo "${R}${L_ERR_BROWSER} $2${N}"; exit 1 ;;
       esac
+      NO_COOKIE=false
       shift 2 ;;
     -n) NO_COOKIE=true; shift ;;
     -i) INFO_ONLY=true; shift ;;
@@ -377,10 +382,22 @@ echo "${LINE}"
 echo ""
 
 # --- Execute ---
+set +e
 yt-dlp "${YT_ARGS[@]}" "$URL"
+EXIT_CODE=$?
+set -e
 
-echo ""
-echo "${LINE}"
-echo "${G}  ${L_DONE}${N}"
-echo "${LINE}"
-echo ""
+if [[ $EXIT_CODE -eq 0 ]]; then
+  echo ""
+  echo "${LINE}"
+  echo "${G}  ${L_DONE}${N}"
+  echo "${LINE}"
+  echo ""
+else
+  echo ""
+  echo "${LINE}"
+  echo "${R}  ✗ ${L_ERR_DOWNLOAD} ${EXIT_CODE}${L_ERR_DOWNLOAD_CLOSE}${N}"
+  echo "${LINE}"
+  echo ""
+  exit $EXIT_CODE
+fi

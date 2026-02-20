@@ -32,7 +32,8 @@ Suggest `brew install yt-dlp ffmpeg` if missing.
 
 ## Step 2: Get video info first
 
-Always start by fetching info so the user knows what they're downloading:
+Always start by fetching info so the user knows what they're downloading.
+Note: cookies are not used by default. Use `-b <browser>` only for restricted content.
 
 ```bash
 ytdl -i "URL"
@@ -102,6 +103,13 @@ After download completes, tell the user:
 - Where files were saved
 - What was downloaded (video/audio, quality)
 
+If download fails:
+1. Show the error to the user
+2. Use AskUserQuestion: "Download failed. What would you like to do?"
+   - "Retry with browser cookies" → re-run the same command with `-b chrome` added
+   - "Try different options" → go back to Step 3
+   - "Cancel"
+
 ## Command Reference
 
 ```
@@ -111,8 +119,8 @@ ytdl [options] <URL>
 -q <res>      quality (360/480/720/1080/1440/2160)
 -o <dir>      output directory (default: ~/Downloads)
 -p            playlist mode
--b <browser>  cookie browser (default: chrome)
--n            no cookies
+-b <browser>  cookie browser (default: off)
+-n            no cookies (default)
 -i            info only
 --            pass remaining args to yt-dlp
 ```

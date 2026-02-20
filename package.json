@@ -1,6 +1,6 @@
 {
   "name": "@kanketsu/ytdl",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Developer-oriented media retrieval CLI with interactive UI (yt-dlp wrapper)",
   "bin": {
     "ytdl": "./cli.js"

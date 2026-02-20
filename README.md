@@ -83,11 +83,13 @@ ytdl "URL" -- --limit-rate 1M                                       # pass yt-dl
 | `-q <res>` | Quality (360/480/720/1080/1440/2160) | best |
 | `-o <dir>` | Output directory | `~/Downloads` |
 | `-p` | Playlist mode | off |
-| `-b <browser>` | Cookie browser | `chrome` |
-| `-n` | No cookies | off |
+| `-b <browser>` | Cookie browser | off |
+| `-n` | No cookies (default) | on |
 | `-i` | Info only | off |
 | `--lang <code>` | Language (`ja` / `en`) | `ja` |
 | `--` | Pass to yt-dlp | - |
+
+By default, ytdl runs without browser cookies. Use `-b <browser>` for restricted content (age-restricted, member-only, etc.).
 
 ## Output
 

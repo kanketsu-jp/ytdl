@@ -1,4 +1,10 @@
 node_modules/
 docs/
+demo/
 CLAUDE.md
 article.md
+.npmignore
+.temp/
+.playwright-mcp/
+*.log
+.DS_Store
