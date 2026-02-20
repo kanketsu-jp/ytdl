@@ -8,3 +8,5 @@ article.md
 .playwright-mcp/
 *.log
 .DS_Store
+.ytdl-server.env
+docker/filebrowser/filebrowser.db
