@@ -1,6 +1,6 @@
 # ytdl
 
-> 🇺🇸 English | 🇯🇵 日本語 | 🇨🇳 简体中文 | 🇪🇸 **Español** | 🇮🇳 हिन्दी | 🇧🇷 Português | 🇮🇩 Bahasa Indonesia
+> 🇺🇸 [English](./README.md) | 🇯🇵 [日本語](./README.ja.md) | 🇨🇳 [简体中文](./README.zh-Hans.md) | 🇪🇸 **Español** | 🇮🇳 [हिन्दी](./README.hi.md) | 🇧🇷 [Português](./README.pt.md) | 🇮🇩 [Bahasa Indonesia](./README.id.md)
 
 CLI de descarga de medios basado en [yt-dlp](https://github.com/yt-dlp/yt-dlp). UI interactiva + AI nativo (plugin de Claude Code).
 

@@ -1,6 +1,6 @@
 # ytdl
 
-> 🇺🇸 English | 🇯🇵 **日本語** | 🇨🇳 简体中文 | 🇪🇸 Español | 🇮🇳 हिन्दी | 🇧🇷 Português | 🇮🇩 Bahasa Indonesia
+> 🇺🇸 [English](./README.md) | 🇯🇵 **日本語** | 🇨🇳 [简体中文](./README.zh-Hans.md) | 🇪🇸 [Español](./README.es.md) | 🇮🇳 [हिन्दी](./README.hi.md) | 🇧🇷 [Português](./README.pt.md) | 🇮🇩 [Bahasa Indonesia](./README.id.md)
 
 [yt-dlp](https://github.com/yt-dlp/yt-dlp) ベースのメディア取得 CLI。インタラクティブ UI + AI ネイティブ（Claude Code プラグイン）。
 

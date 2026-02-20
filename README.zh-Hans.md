@@ -1,6 +1,6 @@
 # ytdl
 
-> 🇺🇸 English | 🇯🇵 日本語 | 🇨🇳 **简体中文** | 🇪🇸 Español | 🇮🇳 हिन्दी | 🇧🇷 Português | 🇮🇩 Bahasa Indonesia
+> 🇺🇸 [English](./README.md) | 🇯🇵 [日本語](./README.ja.md) | 🇨🇳 **简体中文** | 🇪🇸 [Español](./README.es.md) | 🇮🇳 [हिन्दी](./README.hi.md) | 🇧🇷 [Português](./README.pt.md) | 🇮🇩 [Bahasa Indonesia](./README.id.md)
 
 基于 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 的媒体获取 CLI 工具。交互式 UI + AI 原生（Claude Code 插件）。
 

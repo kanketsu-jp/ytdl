@@ -9,4 +9,7 @@ article.md
 *.log
 .DS_Store
 .ytdl-server.env
-docker/filebrowser/filebrowser.db
+.ytdl-server.env.example
+docker/
+scripts/
+openclaw/
