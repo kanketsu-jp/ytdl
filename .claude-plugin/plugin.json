@@ -1,0 +1,12 @@
+{
+  "name": "ytdl",
+  "description": "Media retrieval skill. Retrieves video/audio, extracts audio, shows media info using ytdl (yt-dlp wrapper).",
+  "version": "1.0.0",
+  "author": {
+    "name": "kanketsu-jp"
+  },
+  "homepage": "https://github.com/kanketsu-jp/ytdl",
+  "repository": "https://github.com/kanketsu-jp/ytdl",
+  "license": "MIT",
+  "keywords": ["media", "retrieval", "video", "audio", "yt-dlp"]
+}

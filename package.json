@@ -1,0 +1,43 @@
+{
+  "name": "@kanketsu/ytdl",
+  "version": "1.0.0",
+  "description": "Developer-oriented media retrieval CLI with interactive UI (yt-dlp wrapper)",
+  "bin": {
+    "ytdl": "./cli.js"
+  },
+  "type": "module",
+  "scripts": {
+    "postinstall": "node lib/check-deps.js --quiet || true"
+  },
+  "files": [
+    "cli.js",
+    "bin/",
+    "lib/",
+    "skills/"
+  ],
+  "keywords": [
+    "media",
+    "retrieval",
+    "yt-dlp",
+    "video",
+    "audio",
+    "cli"
+  ],
+  "author": "kanketsu-jp",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kanketsu-jp/ytdl.git"
+  },
+  "homepage": "https://github.com/kanketsu-jp/ytdl",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.9.1",
+    "picocolors": "^1.1.1"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  }
+}

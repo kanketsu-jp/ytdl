@@ -1,0 +1,18 @@
+{
+  "name": "kanketsu-ytdl",
+  "owner": {
+    "name": "kanketsu-jp"
+  },
+  "metadata": {
+    "description": "Media retrieval plugin for Claude Code (yt-dlp wrapper)"
+  },
+  "plugins": [
+    {
+      "name": "ytdl",
+      "source": "skills/download",
+      "description": "Media retrieval skill. Retrieves video/audio, extracts audio, shows media info with interactive prompts.",
+      "version": "1.0.0",
+      "keywords": ["media", "retrieval", "video", "audio", "yt-dlp"]
+    }
+  ]
+}
