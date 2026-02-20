@@ -9,10 +9,12 @@
   "plugins": [
     {
       "name": "ytdl",
-      "source": "skills/download",
+      "source": "./",
       "description": "Media retrieval skill. Retrieves video/audio, extracts audio, shows media info with interactive prompts.",
-      "version": "1.0.0",
-      "keywords": ["media", "retrieval", "video", "audio", "yt-dlp"]
+      "version": "1.3.0",
+      "keywords": ["media", "retrieval", "video", "audio", "yt-dlp"],
+      "strict": false,
+      "skills": ["./skills/download"]
     }
   ]
 }
