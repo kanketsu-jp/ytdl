@@ -641,7 +641,7 @@ fi
 
 # Thumbnail, subtitles, description
 YT_ARGS+=(--write-thumbnail --convert-thumbnails jpg)
-YT_ARGS+=(--write-subs --write-auto-subs --sub-langs all)
+YT_ARGS+=(--write-subs --write-auto-subs --sub-langs "ja,ja-orig,en")
 YT_ARGS+=(--write-description)
 
 # Output template
