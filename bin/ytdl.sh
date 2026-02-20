@@ -1,5 +1,5 @@
 #!/bin/bash
-# ytdl: media retrieval CLI — yt-dlp wrapper
+# ytdl: media retrieval CLI — yt-dlp wrapper (v2.0)
 set -euo pipefail
 
 # --- Color definitions ---
@@ -24,6 +24,15 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 set -- "${_ARGS[@]+"${_ARGS[@]}"}"
+
+# --- Supported languages check ---
+SUPPORTED_LANGS=("ja" "en")
+if [[ ! " ${SUPPORTED_LANGS[@]} " =~ " ${LANG_CODE} " ]]; then
+  echo "${R}Error: Unsupported language '${LANG_CODE}'${N}"
+  echo "Supported: ${SUPPORTED_LANGS[*]}"
+  echo "Use --lang ja or --lang en, or set YTDL_LANG environment variable."
+  exit 1
+fi
 
 # --- i18n ---
 if [[ "$LANG_CODE" == "en" ]]; then
@@ -79,6 +88,29 @@ if [[ "$LANG_CODE" == "en" ]]; then
   L_DONE="Download complete"
   L_ERR_DOWNLOAD="Download failed (exit code:"
   L_ERR_DOWNLOAD_CLOSE=")"
+  L_PROGRESS="Progress"
+  L_SPEED="Speed"
+  L_ETA="ETA"
+  L_DOWNLOADING="Downloading"
+  L_EXTRACTING="Extracting"
+  L_MERGING="Merging"
+  L_POSTPROCESSING="Post-processing"
+  L_WARNINGS_SKIPPED="(repeated warnings hidden)"
+  L_ERRORS="Errors"
+  L_ERRORS_SUMMARY="Error Summary"
+  L_LOG_SAVED="Log saved to:"
+  L_DELETE_ASK="Delete downloaded files for this video?"
+  L_DELETE_WARN="Channel may have other videos - only this video's files will be deleted."
+  L_DELETE_YES="Delete files"
+  L_DELETE_NO="Keep files"
+  L_DOWNLOADING_TO="Downloading to:"
+  L_CANCEL="Cancel"
+  L_TRYAGAIN="Try again"
+  L_ERROR_HELP="Error Help (for AI):"
+  L_ERROR_EXPLANATION="Explanation:"
+  L_ERROR_SUGGESTION="Suggestion:"
+  L_ERROR_CODE="Error Code:"
+  L_VIDEO_DIR="Video directory:"
 else
   L_ERROR_YTDLP="エラー: yt-dlp が見つかりません"
   L_INSTALL_YTDLP="brew install yt-dlp  でインストールしてください"
@@ -132,7 +164,282 @@ else
   L_DONE="ダウンロード完了"
   L_ERR_DOWNLOAD="ダウンロード失敗（終了コード:"
   L_ERR_DOWNLOAD_CLOSE="）"
+  L_PROGRESS="進捗"
+  L_SPEED="速度"
+  L_ETA="残り時間"
+  L_DOWNLOADING="ダウンロード中"
+  L_EXTRACTING="抽出中"
+  L_MERGING="マージ中"
+  L_POSTPROCESSING="後処理中"
+  L_WARNINGS_SKIPPED="（重複警告は省略）"
+  L_ERRORS="エラー"
+  L_ERRORS_SUMMARY="エラー概要"
+  L_LOG_SAVED="ログを保存しました:"
+  L_DELETE_ASK="この動画のファイルを削除しますか？"
+  L_DELETE_WARN="チャンネルには他の動画があるかもしれないため、チャンネルは削除せずこの動画のみ削除します。"
+  L_DELETE_YES="削除する"
+  L_DELETE_NO="残す"
+  L_DOWNLOADING_TO="保存先:"
+  L_CANCEL="キャンセル"
+  L_TRYAGAIN="再試行"
+  L_ERROR_HELP="エラー help (AI用):"
+  L_ERROR_EXPLANATION="説明:"
+  L_ERROR_SUGGESTION="提案:"
+  L_ERROR_CODE="エラーコード:"
+  L_VIDEO_DIR="動画ディレクトリ:"
 fi
+
+# --- Progress bar functions ---
+PROGRESS_BAR_WIDTH=40
+CURRENT_PHASE=""
+CURRENT_PROGRESS=0
+CURRENT_TOTAL=100
+CURRENT_SPEED=""
+CURRENT_ETA=""
+
+init_progress() {
+  CURRENT_PHASE="$1"
+  CURRENT_PROGRESS=0
+  CURRENT_TOTAL=100
+  CURRENT_SPEED=""
+  CURRENT_ETA=""
+}
+
+update_progress() {
+  local phase="$1"
+  local progress="$2"
+  local total="$3"
+  local speed="$4"
+  local eta="$5"
+
+  [[ -n "$phase" ]] && CURRENT_PHASE="$phase"
+  [[ -n "$progress" ]] && CURRENT_PROGRESS="$progress"
+  [[ -n "$total" ]] && CURRENT_TOTAL="$total"
+  [[ -n "$speed" ]] && CURRENT_SPEED="$speed"
+  [[ -n "$eta" ]] && CURRENT_ETA="$eta"
+
+  draw_progress
+}
+
+draw_progress() {
+  local percent=0
+  if [[ $CURRENT_TOTAL -gt 0 ]]; then
+    percent=$((CURRENT_PROGRESS * 100 / CURRENT_TOTAL))
+  fi
+  [[ $percent -gt 100 ]] && percent=100
+  [[ $percent -lt 0 ]] && percent=0
+
+  local filled=0
+  if [[ $CURRENT_TOTAL -gt 0 ]]; then
+    filled=$((PROGRESS_BAR_WIDTH * CURRENT_PROGRESS / CURRENT_TOTAL))
+  fi
+  [[ $filled -gt $PROGRESS_BAR_WIDTH ]] && filled=$PROGRESS_BAR_WIDTH
+  local empty=$((PROGRESS_BAR_WIDTH - filled))
+
+  local bar=""
+  for ((i=0; i<filled; i++)); do bar+="█"; done
+  for ((i=0; i<empty; i++)); do bar+="░"; done
+
+  local info=""
+  [[ -n "$CURRENT_SPEED" ]] && info+=" ${C}${L_SPEED}:${N} $CURRENT_SPEED"
+  [[ -n "$CURRENT_ETA" ]] && info+=" ${C}${L_ETA}:${N} $CURRENT_ETA"
+
+  printf "\r\033[K${C}[${bar}]${N} ${G}%3d%%${N}%s" "$percent" "$info"
+}
+
+# --- Warning deduplication ---
+WARNING_LOG_FILE=""
+WARNING_COUNT=0
+SKIPPED_WARNING_COUNT=0
+
+init_warning_tracker() {
+  local timestamp
+  timestamp=$(date +"%Y%m%d_%H%M%S")
+  WARNING_LOG_FILE="/tmp/ytdl_warnings_${timestamp}.txt"
+  > "$WARNING_LOG_FILE"
+}
+
+process_warning() {
+  local warning="$1"
+  local key="$warning"
+
+  key="${key//\[download\] /}"
+  key="${key//\[info\] /}"
+  key="${key//\[error\] /}"
+
+  if ! grep -qF -- "$key" "$WARNING_LOG_FILE" 2>/dev/null; then
+    echo "$key" >> "$WARNING_LOG_FILE"
+    WARNING_COUNT=$((WARNING_COUNT + 1))
+    echo "${Y}⚠ ${warning}${N}" >&2
+  else
+    SKIPPED_WARNING_COUNT=$((SKIPPED_WARNING_COUNT + 1))
+  fi
+}
+
+cleanup_warning_tracker() {
+  if [[ -n "$WARNING_LOG_FILE" && -f "$WARNING_LOG_FILE" ]]; then
+    rm -f "$WARNING_LOG_FILE"
+  fi
+}
+
+# --- Log file ---
+LOG_FILE=""
+
+setup_log() {
+  local timestamp
+  timestamp=$(date +"%Y%m%d_%H%M%S")
+  LOG_FILE="${BASE_DIR}/ytdl_${timestamp}.log"
+
+  {
+    echo "=== ytdl Log ==="
+    echo "Date: $(date)"
+    echo "URL: $URL"
+    echo "Mode: $MODE"
+    echo "Quality: $QUALITY"
+    echo "Output: $BASE_DIR"
+    echo "==============="
+    echo ""
+  } > "$LOG_FILE"
+}
+
+log_msg() {
+  echo "$1" >> "$LOG_FILE"
+}
+
+close_log() {
+  :
+}
+
+# --- Error tracking (file-based) ---
+ERROR_LOG_FILE=""
+
+init_error_tracker() {
+  local timestamp
+  timestamp=$(date +"%Y%m%d_%H%M%S")
+  ERROR_LOG_FILE="/tmp/ytdl_errors_${timestamp}.txt"
+  > "$ERROR_LOG_FILE"
+}
+
+add_error() {
+  local error_code="$1"
+  local error_msg="$2"
+  
+  echo "[$error_code] $error_msg" >> "$ERROR_LOG_FILE"
+}
+
+cleanup_error_tracker() {
+  if [[ -n "$ERROR_LOG_FILE" && -f "$ERROR_LOG_FILE" ]]; then
+    rm -f "$ERROR_LOG_FILE"
+  fi
+}
+
+get_error_explanation() {
+  local err="$1"
+  
+  case "$err" in
+    *"HTTP Error 429"*)
+      echo "YouTube rate limited the request (Too Many Requests).";;
+    *"Unable to download video subtitles"*)
+      echo "Video subtitles could not be downloaded.";;
+    *"Signatures are unavailable"*)
+      echo "YouTube updated their encryption. Update yt-dlp.";;
+    *"Unable to extract"*)
+      echo "Could not extract video information.";;
+    *"Video unavailable"*)
+      echo "The video has been removed or made private.";;
+    *"This video is available only"*)
+      echo "Video is not available in your region.";;
+    *)
+      echo "General yt-dlp error. Check the error message above.";;
+  esac
+}
+
+get_error_suggestion() {
+  local err="$1"
+  
+  case "$err" in
+    *"HTTP Error 429"*)
+      echo "Wait a while and retry, or use --cookies-from-browser.";;
+    *"Unable to download video subtitles"*)
+      echo "Try without subtitles using --no-subs or specific subtitle languages.";;
+    *"Signatures are unavailable"*)
+      echo "Update yt-dlp: pip install -U yt-dlp";;
+    *"Unable to extract"*)
+      echo "Video may be private, age-restricted, or region-locked.";;
+    *"Video unavailable"*)
+      echo "Verify the video URL is correct.";;
+    *"This video is available only"*)
+      echo "Use proxy or cookies from a different region.";;
+    *)
+      echo "Check the error message and try different options.";;
+  esac
+}
+
+# --- Output parser for yt-dlp ---
+parse_yt_dlp_output() {
+  while IFS= read -r line; do
+    log_msg "$line"
+
+    # Skip empty lines
+    [[ -z "$line" ]] && continue
+
+    # Progress lines
+    if [[ "$line" =~ \[download\]\ *([0-9.]+)% ]]; then
+      local percent="${BASH_REMATCH[1]}"
+      CURRENT_PROGRESS="${percent%.*}"
+
+      if [[ "$line" =~ at\ +([^ ]+iB/s) ]]; then
+        CURRENT_SPEED="${BASH_REMATCH[1]}"
+      fi
+      if [[ "$line" =~ ETA\ +([0-9:]+) ]]; then
+        CURRENT_ETA="${BASH_REMATCH[1]}"
+      fi
+      draw_progress
+      continue
+    fi
+
+    # Phase detection — print phase label on new line, then start fresh progress
+    if [[ "$line" =~ \[download\]\ *Downloading\ *.*:\ *(.*) ]]; then
+      echo ""
+      echo "${C}  ${L_DOWNLOADING}: ${BASH_REMATCH[1]}${N}"
+      init_progress "${L_DOWNLOADING}"
+    elif [[ "$line" =~ \[download\]\ *Destination\ *(.*) ]]; then
+      : # destination info already in download phase
+    elif [[ "$line" =~ \[download\]\ *Merging ]]; then
+      echo ""
+      echo "${C}  ${L_MERGING}${N}"
+      init_progress "${L_MERGING}"
+    elif [[ "$line" =~ \[extractaudio\] ]]; then
+      echo ""
+      echo "${C}  ${L_EXTRACTING}${N}"
+      init_progress "${L_EXTRACTING}"
+    elif [[ "$line" =~ \[Thumbnails\] ]]; then
+      : # thumbnail processing, no progress bar needed
+    elif [[ "$line" =~ \[Subtitles\] ]]; then
+      : # subtitles processing, no progress bar needed
+    fi
+
+    # Handle warnings
+    if [[ "$line" =~ ^WARNING ]]; then
+      process_warning "${line#WARNING }"
+      continue
+    fi
+
+    # Handle errors
+    if [[ "$line" =~ ^ERROR ]]; then
+      local err_msg="${line#ERROR }"
+      echo "${R}✗ ${err_msg}${N}" >&2
+      log_msg "ERROR: $err_msg"
+      add_error "$err_msg" "$err_msg"
+      continue
+    fi
+
+    # Regular output
+    if [[ -n "$line" && ! "$line" =~ ^\[ ]]; then
+      echo "$line"
+    fi
+  done
+}
 
 # --- yt-dlp existence check ---
 if ! command -v yt-dlp &>/dev/null; then
@@ -311,7 +618,7 @@ print(f'  {W}URL:{N} {d.get(\"webpage_url\", \"N/A\")}')
 fi
 
 # --- Build yt-dlp args ---
-YT_ARGS=(--ignore-config)
+YT_ARGS=(--ignore-config --newline --progress)
 
 # Cookies
 if [[ "$NO_COOKIE" == false ]]; then
@@ -340,15 +647,22 @@ YT_ARGS+=(--write-description)
 # Output template
 if [[ "$PLAYLIST_MODE" == true ]]; then
   YT_ARGS+=(--yes-playlist)
-  YT_ARGS+=(-o "${BASE_DIR}/%(channel)s/%(playlist_title)s/%(playlist_index)03d_%(title)s/%(playlist_index)03d_%(title)s.%(ext)s")
+  OUTPUT_TEMPLATE="${BASE_DIR}/%(channel)s/%(playlist_title)s/%(playlist_index)03d_%(title)s/%(playlist_index)03d_%(title)s.%(ext)s"
 else
   YT_ARGS+=(--no-playlist)
-  YT_ARGS+=(-o "${BASE_DIR}/%(channel)s/%(title)s/%(title)s.%(ext)s")
+  OUTPUT_TEMPLATE="${BASE_DIR}/%(channel)s/%(title)s/%(title)s.%(ext)s"
 fi
+YT_ARGS+=(-o "$OUTPUT_TEMPLATE")
 
 # Extra args
 if [[ ${#EXTRA_ARGS[@]} -gt 0 ]]; then
   YT_ARGS+=("${EXTRA_ARGS[@]}")
+fi
+
+# --- Mode string ---
+MODE="video"
+if [[ "$AUDIO_ONLY" == true ]]; then
+  MODE="audio"
 fi
 
 # --- Pre-execution summary ---
@@ -381,23 +695,126 @@ echo ""
 echo "${LINE}"
 echo ""
 
-# --- Execute ---
-set +e
-yt-dlp "${YT_ARGS[@]}" "$URL"
-EXIT_CODE=$?
-set -e
+# --- Setup log and tracking ---
+init_warning_tracker
+init_error_tracker
+setup_log
 
-if [[ $EXIT_CODE -eq 0 ]]; then
+# --- Signal handling for cancel ---
+DOWNLOAD_DIR=""
+
+cleanup_on_cancel() {
   echo ""
-  echo "${LINE}"
-  echo "${G}  ${L_DONE}${N}"
-  echo "${LINE}"
   echo ""
+  echo "${Y}⚠ ${L_CANCEL} detected${N}"
+
+  if [[ -n "$DOWNLOAD_DIR" && -d "$DOWNLOAD_DIR" ]]; then
+    echo ""
+    echo "${LINE}"
+    echo "${Y}  ${L_DELETE_ASK}${N}"
+    echo "${D}  ${L_DELETE_WARN}${N}"
+    echo "${LINE}"
+    echo ""
+    echo "  1) ${G}${L_DELETE_YES}${N}"
+    echo "  2) ${R}${L_DELETE_NO}${N}"
+    echo ""
+
+    read -p "Select [2]: " -n 1 -r
+    echo
+
+    if [[ "$REPLY" == "1" ]]; then
+      rm -rf "$DOWNLOAD_DIR"
+      echo "${G}✓ Files deleted${N}"
+    else
+      echo "${Y}✓ Files kept at: ${DOWNLOAD_DIR}${N}"
+    fi
+  fi
+
+  close_log
+  cleanup_warning_tracker
+  cleanup_error_tracker
+  
+  if [[ -n "$LOG_FILE" && -f "$LOG_FILE" ]]; then
+    echo "${C}  ${L_LOG_SAVED} ${LOG_FILE}${N}"
+  fi
+
+  exit 130
+}
+
+trap cleanup_on_cancel INT TERM
+
+# --- Execute yt-dlp with progress parsing ---
+echo "${C}  ${L_DOWNLOADING_TO}${N} ${BASE_DIR}/"
+echo ""
+
+init_progress "Starting..."
+draw_progress
+echo ""
+
+# Run yt-dlp and parse output
+yt-dlp "${YT_ARGS[@]}" "$URL" 2>&1 | parse_yt_dlp_output
+EXIT_CODE=${PIPESTATUS[0]}
+
+echo ""
+
+# --- Detect download directory ---
+if [[ "$PLAYLIST_MODE" == true ]]; then
+  DOWNLOAD_DIR=$(dirname "$(ls -td "${BASE_DIR}"/*/ 2>/dev/null | head -1)" 2>/dev/null || echo "")
 else
+  DOWNLOAD_DIR=$(dirname "$(ls -td "${BASE_DIR}"/*/*/ 2>/dev/null | head -1)" 2>/dev/null || echo "")
+fi
+
+# --- Show results ---
+if [[ $EXIT_CODE -eq 0 ]]; then
+  echo "${LINE}"
+  echo "${G}  ✓ ${L_DONE}${N}"
+  echo "${LINE}"
   echo ""
+
+  if [[ $WARNING_COUNT -gt 0 ]]; then
+    echo "${Y}  ⚠ ${WARNING_COUNT} warnings${N}"
+    if [[ $SKIPPED_WARNING_COUNT -gt 0 ]]; then
+      echo "${D}    ${L_WARNINGS_SKIPPED} (${SKIPPED_WARNING_COUNT})${N}"
+    fi
+    echo ""
+  fi
+else
   echo "${LINE}"
   echo "${R}  ✗ ${L_ERR_DOWNLOAD} ${EXIT_CODE}${L_ERR_DOWNLOAD_CLOSE}${N}"
   echo "${LINE}"
   echo ""
-  exit $EXIT_CODE
+
+  # Show error summary from file
+  if [[ -f "$ERROR_LOG_FILE" ]]; then
+    echo "${R}  ${L_ERRORS_SUMMARY}${N}"
+    echo ""
+    while IFS= read -r line; do
+      err_code="${line%%\]*}"
+      err_code="${err_code#\[}"
+      err_msg="${line#*\] }"
+
+      echo "  ${R}[${err_code}]${N} ${err_msg}"
+      echo "    ${C}${L_ERROR_EXPLANATION}${N} $(get_error_explanation "$err_msg")"
+      echo "    ${G}${L_ERROR_SUGGESTION}${N} $(get_error_suggestion "$err_msg")"
+      echo ""
+    done < "$ERROR_LOG_FILE"
+  fi
+
+  # AI-friendly error output
+  echo "${W}${L_ERROR_HELP}${N}"
+  echo "${C}${L_ERROR_CODE}:${N} ${EXIT_CODE}"
+  if [[ -n "$DOWNLOAD_DIR" ]]; then
+    echo "${C}${L_VIDEO_DIR}:${N} ${DOWNLOAD_DIR}"
+  fi
+  echo ""
 fi
+
+# --- Save log ---
+close_log
+cleanup_warning_tracker
+cleanup_error_tracker
+
+echo "${C}  ${L_LOG_SAVED} ${LOG_FILE}${N}"
+echo ""
+
+exit $EXIT_CODE
