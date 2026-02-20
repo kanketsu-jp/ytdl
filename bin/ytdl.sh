@@ -48,6 +48,7 @@ if [[ "$LANG_CODE" == "en" ]]; then
   L_OPT_P="Playlist mode (numbered prefix)"
   L_OPT_B="Cookie browser"
   L_OPT_N="No cookies"
+  L_OPT_S="Subtitle languages (e.g. ja,en)"
   L_OPT_I="Show info only (no download)"
   L_OPT_H="Show this help"
   L_OPT_PASS="Pass remaining args to yt-dlp"
@@ -124,6 +125,7 @@ else
   L_OPT_P="プレイリストモード（番号プレフィックス付き）"
   L_OPT_B="クッキー取得元ブラウザ"
   L_OPT_N="クッキーなしで実行"
+  L_OPT_S="字幕言語（例: ja,en）"
   L_OPT_I="動画情報のみ表示（DLしない）"
   L_OPT_H="このヘルプを表示"
   L_OPT_PASS="以降を yt-dlp に直接渡す"
@@ -464,6 +466,7 @@ show_help() {
   echo "  ${G}-p${N}             ${L_OPT_P}"
   echo "  ${G}-b${N} <browser>   ${L_OPT_B}  ${D}[off]${N}"
   echo "  ${G}-n${N}             ${L_OPT_N}"
+  echo "  ${G}-s${N} <langs>     ${L_OPT_S}  ${D}[auto]${N}"
   echo "  ${G}-i${N}             ${L_OPT_I}"
   echo "  ${G}-h${N}             ${L_OPT_H}"
   echo "  ${G}--${N}             ${L_OPT_PASS}"
@@ -486,6 +489,7 @@ PLAYLIST_MODE=false
 BROWSER="chrome"
 NO_COOKIE=true
 INFO_ONLY=false
+SUB_LANGS=""
 URL=""
 EXTRA_ARGS=()
 
@@ -519,6 +523,11 @@ while [[ $# -gt 0 ]]; do
       NO_COOKIE=false
       shift 2 ;;
     -n) NO_COOKIE=true; shift ;;
+    -s)
+      if [[ -z "${2:-}" || "$2" == -* ]]; then
+        echo "${R}${L_ERR_UNKNOWN} -s (no value)${N}"; exit 1
+      fi
+      SUB_LANGS="$2"; shift 2 ;;
     -i) INFO_ONLY=true; shift ;;
     -h|--help) show_help; exit 0 ;;
     --)
@@ -641,7 +650,14 @@ fi
 
 # Thumbnail, subtitles, description
 YT_ARGS+=(--write-thumbnail --convert-thumbnails jpg)
-YT_ARGS+=(--write-subs --write-auto-subs --sub-langs "ja,ja-orig,en")
+# Subtitle languages: use -s value, or default based on LANG_CODE
+if [[ -n "$SUB_LANGS" ]]; then
+  YT_ARGS+=(--write-subs --write-auto-subs --sub-langs "$SUB_LANGS")
+elif [[ "$LANG_CODE" == "ja" ]]; then
+  YT_ARGS+=(--write-subs --write-auto-subs --sub-langs "ja,ja-orig")
+else
+  YT_ARGS+=(--write-subs --write-auto-subs --sub-langs "en")
+fi
 YT_ARGS+=(--write-description)
 
 # Output template
