@@ -12,11 +12,15 @@ import { t, currentLang } from "./lib/i18n.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SCRIPT = path.join(__dirname, "bin", "ytdl.sh");
 
-// --- Strip --lang from argv before passing to bash ---
+// --- Strip --lang and transcribe options from argv before passing to bash ---
 const rawArgv = process.argv.slice(2);
 const argv = [];
 for (let i = 0; i < rawArgv.length; i++) {
   if (rawArgv[i] === "--lang") {
+    i++; // skip value
+    continue;
+  }
+  if (rawArgv[i] === "--backend" || rawArgv[i] === "--manuscript") {
     i++; // skip value
     continue;
   }
@@ -89,6 +93,13 @@ async function run() {
   }
 
   const args = buildArgs(opts);
+
+  if (opts.transcribe) {
+    args.push("-t");
+    if (opts.transcribeBackend && opts.transcribeBackend !== "local") {
+      args.push("--backend", opts.transcribeBackend);
+    }
+  }
 
   console.log("");
   p.log.info(
