@@ -125,6 +125,35 @@ Pegue una URL de medios o diga "descarga esto" en cualquier conversación de Cla
 3. Pregunta qué desea (video/audio, calidad, ubicación)
 4. Descarga el medio
 
+## Funciones IA
+
+### Análisis de URL de página
+
+No necesita buscar la URL directa del video. Solo pegue la URL de la página donde está el video y la IA:
+
+1. Analiza la página para encontrar videos incrustados
+2. Muestra lo encontrado (si hay varios, le permite elegir)
+3. Descarga el/los video(s) seleccionado(s)
+
+Funciona con Claude Code y OpenClaw.
+
+**Ejemplo:**
+```
+Guarda el video de https://example.com/blog/my-post
+```
+
+### Descargas en lote
+
+Pegue múltiples URLs a la vez. La IA pregunta sus preferencias (video/audio, calidad) solo una vez y las aplica a todas las descargas.
+
+**Ejemplo:**
+```
+Descarga estos:
+https://youtube.com/watch?v=aaa
+https://youtube.com/watch?v=bbb
+https://youtube.com/watch?v=ccc
+```
+
 ## Descargo de responsabilidad
 
 Este software se proporciona solo para uso legal. Los autores no son responsables de ningún uso indebido.

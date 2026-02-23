@@ -1,7 +1,7 @@
 ---
 name: download
-description: "Retrieve media via yt-dlp. Activates when the user shares a video URL, asks to download media, extract audio, or get media info from sites supported by yt-dlp."
-allowed-tools: Bash, AskUserQuestion
+description: "Retrieve media via yt-dlp. Activates when the user shares a video URL, asks to download media, extract audio, or get media info from sites supported by yt-dlp. Supports batch downloads (multiple URLs) and page URL analysis."
+allowed-tools: Bash, AskUserQuestion, WebFetch
 ---
 
 # ytdl — Media Retrieval Skill
@@ -30,6 +30,23 @@ command -v ffmpeg >/dev/null 2>&1 && echo "ok" || echo "missing ffmpeg"
 ```
 Suggest `brew install yt-dlp ffmpeg` if missing.
 
+## Step 1.5: Analyze URLs
+
+Collect all URLs from the user's message.
+
+**If the user provides a URL that is NOT a direct video/playlist URL** (e.g., a blog post, news article, or any web page):
+
+1. Use WebFetch to fetch the page content
+2. Look for embedded video URLs:
+   - `<video>` / `<iframe>` elements with `src` attributes
+   - `og:video` / `og:video:url` meta tags
+   - YouTube/Vimeo/other embed URLs in the page source
+   - JSON-LD `VideoObject` schema
+3. If found, present the video URLs to the user and ask which to download
+4. If not found, try `ytdl -i "URL"` anyway (yt-dlp supports 1000+ sites natively)
+
+**If the user provides multiple URLs**, collect all of them for batch processing.
+
 ## Step 2: Get video info first
 
 Always start by fetching info so the user knows what they're downloading.
@@ -39,11 +56,17 @@ Note: cookies are not used by default. Use `-b <browser>` only for restricted co
 ytdl -i "URL"
 ```
 
-Show the result to the user.
+For multiple URLs, fetch info for each:
+```bash
+ytdl -i "URL1"
+ytdl -i "URL2"
+```
+
+Show all results to the user.
 
 ## Step 3: Ask what to download
 
-Use AskUserQuestion:
+Use AskUserQuestion **once** (applies to all URLs if batch):
 
 - Question: "What do you want to download?"
 - Options:
@@ -61,7 +84,7 @@ Use AskUserQuestion:
 
 ## Step 5: Ask save location
 
-Use AskUserQuestion:
+Use AskUserQuestion **once** (applies to all URLs if batch):
 
 - Question: "Where to save?"
 - Options:
@@ -72,7 +95,7 @@ Use AskUserQuestion:
 
 ## Step 6: Execute
 
-Build and run the command. Examples:
+Build and run the command. For single URL:
 
 ```bash
 # Best quality video
@@ -91,7 +114,15 @@ ytdl -a -o ~/Music "URL"
 ytdl -p "URL"
 ```
 
-If the URL contains `playlist` or `list=`, ask first:
+**For multiple URLs**, execute ytdl for each URL sequentially with the same settings:
+
+```bash
+ytdl -q 720 "URL1"
+ytdl -q 720 "URL2"
+ytdl -q 720 "URL3"
+```
+
+If any URL contains `playlist` or `list=`, ask first:
 - "This looks like a playlist. Download all videos?"
 - Options: "Yes, download all", "No, single video only"
 
@@ -99,15 +130,16 @@ If playlist → add `-p` flag.
 
 ## Step 7: Report result
 
-After download completes, tell the user:
+After all downloads complete, report results together:
+- How many succeeded / failed
 - Where files were saved
 - What was downloaded (video/audio, quality)
 
-If download fails:
+If any download fails:
 1. Show the error to the user
-2. Use AskUserQuestion: "Download failed. What would you like to do?"
-   - "Retry with browser cookies" → re-run the same command with `-b chrome` added
-   - "Try different options" → go back to Step 3
+2. Use AskUserQuestion: "Some downloads failed. What would you like to do?"
+   - "Retry failed with browser cookies" → re-run failed URLs with `-b chrome` added
+   - "Skip failed and continue" → done
    - "Cancel"
 
 ## Command Reference
@@ -132,7 +164,8 @@ Output structure: `{dir}/{channel}/{title}/{title}.{ext}`
 1. ALWAYS use `ytdl`, never call `yt-dlp` directly.
 2. ALWAYS fetch info (`ytdl -i`) before downloading.
 3. ALWAYS use AskUserQuestion for choices — never assume.
-4. If the user already specified what they want (e.g., "download audio from this"), skip redundant questions.
+4. If the user already specified what they want (e.g., "download audio from these"), skip redundant questions.
+5. For batch downloads, ask preferences ONCE and apply to all URLs.
 
 ## Security
 

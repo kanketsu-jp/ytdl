@@ -113,6 +113,12 @@ case "$LANG_CODE" in
     L_ERROR_SUGGESTION="Suggestion:"
     L_ERROR_CODE="Error Code:"
     L_VIDEO_DIR="Video directory:"
+    L_OPT_TRANSCRIBE="Transcribe after download"
+    L_OPT_BACKEND="Transcribe backend (local/api)"
+    L_OPT_MANUSCRIPT="Manuscript file path (for accuracy)"
+    L_TRANSCRIBE_STARTING="🎙  Starting transcription..."
+    L_TRANSCRIBE_DONE="✅ Transcription complete"
+    L_TRANSCRIBE_FAILED="❌ Transcription failed"
     ;;
   zh-Hans)
     L_ERROR_YTDLP="错误：未找到 yt-dlp"
@@ -191,6 +197,12 @@ case "$LANG_CODE" in
     L_ERROR_SUGGESTION="建议："
     L_ERROR_CODE="错误代码："
     L_VIDEO_DIR="视频目录："
+    L_OPT_TRANSCRIBE="下载后进行语音转文字"
+    L_OPT_BACKEND="转录后端 (local/api)"
+    L_OPT_MANUSCRIPT="原稿文件路径（提高准确度）"
+    L_TRANSCRIBE_STARTING="🎙  开始语音转文字..."
+    L_TRANSCRIBE_DONE="✅ 语音转文字完成"
+    L_TRANSCRIBE_FAILED="❌ 语音转文字失败"
     ;;
   es)
     L_ERROR_YTDLP="Error: yt-dlp no encontrado"
@@ -269,6 +281,12 @@ case "$LANG_CODE" in
     L_ERROR_SUGGESTION="Sugerencia:"
     L_ERROR_CODE="Código de error:"
     L_VIDEO_DIR="Directorio del video:"
+    L_OPT_TRANSCRIBE="Transcribir después de descargar"
+    L_OPT_BACKEND="Backend de transcripción (local/api)"
+    L_OPT_MANUSCRIPT="Ruta del manuscrito (para precisión)"
+    L_TRANSCRIBE_STARTING="🎙  Iniciando transcripción..."
+    L_TRANSCRIBE_DONE="✅ Transcripción completada"
+    L_TRANSCRIBE_FAILED="❌ Transcripción fallida"
     ;;
   hi)
     L_ERROR_YTDLP="त्रुटि: yt-dlp नहीं मिला"
@@ -347,6 +365,12 @@ case "$LANG_CODE" in
     L_ERROR_SUGGESTION="सुझाव:"
     L_ERROR_CODE="त्रुटि कोड:"
     L_VIDEO_DIR="वीडियो डायरेक्टरी:"
+    L_OPT_TRANSCRIBE="डाउनलोड के बाद ट्रांसक्राइब"
+    L_OPT_BACKEND="ट्रांसक्रिप्शन बैकेंड (local/api)"
+    L_OPT_MANUSCRIPT="पांडुलिपि फ़ाइल पथ (सटीकता के लिए)"
+    L_TRANSCRIBE_STARTING="🎙  ट्रांसक्रिप्शन शुरू..."
+    L_TRANSCRIBE_DONE="✅ ट्रांसक्रिप्शन पूर्ण"
+    L_TRANSCRIBE_FAILED="❌ ट्रांसक्रिप्शन विफल"
     ;;
   pt)
     L_ERROR_YTDLP="Erro: yt-dlp não encontrado"
@@ -425,6 +449,12 @@ case "$LANG_CODE" in
     L_ERROR_SUGGESTION="Sugestão:"
     L_ERROR_CODE="Código de erro:"
     L_VIDEO_DIR="Diretório do vídeo:"
+    L_OPT_TRANSCRIBE="Transcrever após download"
+    L_OPT_BACKEND="Backend de transcrição (local/api)"
+    L_OPT_MANUSCRIPT="Caminho do manuscrito (para precisão)"
+    L_TRANSCRIBE_STARTING="🎙  Iniciando transcrição..."
+    L_TRANSCRIBE_DONE="✅ Transcrição concluída"
+    L_TRANSCRIBE_FAILED="❌ Transcrição falhou"
     ;;
   id)
     L_ERROR_YTDLP="Error: yt-dlp tidak ditemukan"
@@ -503,6 +533,12 @@ case "$LANG_CODE" in
     L_ERROR_SUGGESTION="Saran:"
     L_ERROR_CODE="Kode Error:"
     L_VIDEO_DIR="Direktori video:"
+    L_OPT_TRANSCRIBE="Transkrip setelah unduh"
+    L_OPT_BACKEND="Backend transkripsi (local/api)"
+    L_OPT_MANUSCRIPT="Path file manuskrip (untuk akurasi)"
+    L_TRANSCRIBE_STARTING="🎙  Memulai transkripsi..."
+    L_TRANSCRIBE_DONE="✅ Transkripsi selesai"
+    L_TRANSCRIBE_FAILED="❌ Transkripsi gagal"
     ;;
   *) # ja (default)
     L_ERROR_YTDLP="エラー: yt-dlp が見つかりません"
@@ -581,6 +617,12 @@ case "$LANG_CODE" in
     L_ERROR_SUGGESTION="提案:"
     L_ERROR_CODE="エラーコード:"
     L_VIDEO_DIR="動画ディレクトリ:"
+    L_OPT_TRANSCRIBE="ダウンロード後に文字起こし"
+    L_OPT_BACKEND="文字起こしバックエンド (local/api)"
+    L_OPT_MANUSCRIPT="原稿ファイルパス（精度向上用）"
+    L_TRANSCRIBE_STARTING="🎙  文字起こし開始..."
+    L_TRANSCRIBE_DONE="✅ 文字起こし完了"
+    L_TRANSCRIBE_FAILED="❌ 文字起こし失敗"
     ;;
 esac
 
@@ -861,6 +903,9 @@ show_help() {
   echo "  ${G}-n${N}             ${L_OPT_N}"
   echo "  ${G}-s${N} <langs>     ${L_OPT_S}  ${D}[auto]${N}"
   echo "  ${G}-i${N}             ${L_OPT_I}"
+  echo "  ${G}-t${N}             ${L_OPT_TRANSCRIBE}"
+  echo "  ${G}--backend${N} <b>  ${L_OPT_BACKEND}  ${D}[local]${N}"
+  echo "  ${G}--manuscript${N} <path>  ${L_OPT_MANUSCRIPT}"
   echo "  ${G}-h${N}             ${L_OPT_H}"
   echo "  ${G}--${N}             ${L_OPT_PASS}"
   echo ""
@@ -884,6 +929,9 @@ NO_COOKIE=true
 INFO_ONLY=false
 SUB_LANGS=""
 URL=""
+TRANSCRIBE=false
+TRANSCRIBE_BACKEND="local"
+TRANSCRIBE_MANUSCRIPT=""
 EXTRA_ARGS=()
 
 # --- Parse options ---
@@ -922,6 +970,17 @@ while [[ $# -gt 0 ]]; do
       fi
       SUB_LANGS="$2"; shift 2 ;;
     -i) INFO_ONLY=true; shift ;;
+    -t|--transcribe) TRANSCRIBE=true; shift ;;
+    --backend)
+      if [[ -z "${2:-}" || "$2" == -* ]]; then
+        echo "${R}--backend requires a value${N}"; exit 1
+      fi
+      TRANSCRIBE_BACKEND="$2"; shift 2 ;;
+    --manuscript)
+      if [[ -z "${2:-}" || "$2" == -* ]]; then
+        echo "${R}--manuscript requires a value${N}"; exit 1
+      fi
+      TRANSCRIBE_MANUSCRIPT="$2"; shift 2 ;;
     -h|--help) show_help; exit 0 ;;
     --)
       shift
@@ -1187,6 +1246,27 @@ if [[ $EXIT_CODE -eq 0 ]]; then
     echo "${Y}  ⚠ ${WARNING_COUNT} warnings${N}"
     if [[ $SKIPPED_WARNING_COUNT -gt 0 ]]; then
       echo "${D}    ${L_WARNINGS_SKIPPED} (${SKIPPED_WARNING_COUNT})${N}"
+    fi
+    echo ""
+  fi
+
+  # --- Transcribe hook ---
+  if [[ "$TRANSCRIBE" == "true" ]]; then
+    echo "${W}  ${L_TRANSCRIBE_STARTING}${N}"
+    MEDIA_FILE=$(find "${DOWNLOAD_DIR:-$BASE_DIR}" -type f \( -name "*.mp4" -o -name "*.webm" -o -name "*.mkv" -o -name "*.m4a" -o -name "*.mp3" \) -maxdepth 3 2>/dev/null | head -1)
+    if [[ -n "$MEDIA_FILE" ]]; then
+      SCRIPT_DIR_ABS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+      MS_ARG=""
+      [[ -n "$TRANSCRIBE_MANUSCRIPT" ]] && MS_ARG="manuscript: '${TRANSCRIBE_MANUSCRIPT}',"
+      node --input-type=module -e "
+        import { transcribe } from '${SCRIPT_DIR_ABS}/../lib/transcribe.js';
+        transcribe('${MEDIA_FILE}', {
+          backend: '${TRANSCRIBE_BACKEND}',
+          language: '${LANG_CODE}',
+          ${MS_ARG}
+        }).then(() => console.log('${G}  ${L_TRANSCRIBE_DONE}${N}'))
+          .catch(e => console.error('${R}  ${L_TRANSCRIBE_FAILED}${N}', e.message));
+      " || true
     fi
     echo ""
   fi

@@ -12,12 +12,15 @@ lib/
   interactive.js                # @clack/prompts interactive UI
   build-args.js                 # Interactive choices → CLI flags
   i18n.js                       # i18n (ja/en/zh-Hans/es/hi/pt/id), language detection
+  transcribe.js                 # Transcription core (local mlx-whisper / OpenAI API)
+  spec-check.js                 # Machine spec check (Apple Silicon / memory, cached)
 skills/
   download/SKILL.md             # Claude Code agent skill (AskUserQuestion flow)
 .claude-plugin/
   plugin.json                   # Claude Code plugin manifest
   marketplace.json              # Marketplace catalog
 openclaw/
+  setup/SKILL.md                # OpenClaw skill (one-click environment setup)
   acquire-and-share/SKILL.md    # OpenClaw skill (DL→MinIO→share pipeline)
 scripts/
   setup_environment.sh          # Environment bootstrap (Docker, MinIO, mc)
@@ -66,6 +69,9 @@ ytdl [options] <URL> [-- yt-dlp-options...]
 -b <browser>  cookie browser (default: off)
 -n            no cookies (default)
 -i            info only
+-t            transcribe after download (local mlx-whisper or OpenAI API)
+--backend <b> transcribe backend (local/api, default: local)
+--manuscript <path>  manuscript file for accuracy boost
 --lang <code> language (ja/en/zh-Hans/es/hi/pt/id, default: ja, or set YTDL_LANG env)
 --            pass remaining to yt-dlp
 ```
@@ -83,13 +89,24 @@ ytdl [options] <URL> [-- yt-dlp-options...]
 
 Adding an option → update: `bin/ytdl.sh` (while/case + show_help + i18n vars), `lib/interactive.js`, `lib/build-args.js`, `lib/i18n.js` (ja/en keys), `skills/download/SKILL.md`
 
+Changing batch/pipeline behavior → update: `scripts/acquire_and_share.sh`, `openclaw/acquire-and-share/SKILL.md`, `skills/download/SKILL.md`
+
 ## OpenClaw Integration
 
-The `openclaw/` directory contains skills for OpenClaw agent integration. These scripts enable:
+The `openclaw/` directory contains skills for OpenClaw agent integration:
 
-- **Download to MinIO**: Download media and upload directly to MinIO object storage
-- **Shareable Links**: Generate presigned URLs or FileBrowser share links
-- **Environment Management**: Docker Compose setup for MinIO + FileBrowser
+- `openclaw/setup/SKILL.md` — One-click environment setup (Docker, MinIO, FileBrowser)
+- `openclaw/acquire-and-share/SKILL.md` — Download media and generate shareable links
+
+### One-Click Setup (OpenClaw)
+
+OpenClaw users can set up the entire ytdl environment by passing this skill URL:
+```
+https://raw.githubusercontent.com/kanketsu-jp/ytdl/main/openclaw/setup/SKILL.md
+```
+The skill automates: npm install, Docker services, MinIO/FileBrowser configuration, and verification.
+
+### Scripts
 
 The main entry point is `scripts/acquire_and_share.sh` which handles the full pipeline:
 1. Validate URL

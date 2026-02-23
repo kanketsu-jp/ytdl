@@ -125,6 +125,35 @@ Paste a media URL or say "download this" in any Claude Code conversation. The sk
 3. Asks what you want (video/audio, quality, save location)
 4. Retrieves the media
 
+## AI Features
+
+### Page URL Analysis
+
+You don't need to find the direct video URL yourself. Just paste the page URL where the video is embedded, and the AI will:
+
+1. Analyze the page to find embedded videos
+2. Show you what was found (if multiple, lets you choose)
+3. Download the selected video(s)
+
+Works with Claude Code and OpenClaw.
+
+**Example:**
+```
+Save the video from https://example.com/blog/my-post
+```
+
+### Batch Downloads
+
+Paste multiple URLs at once. The AI asks your preferences (video/audio, quality) only once and applies them to all downloads.
+
+**Example:**
+```
+Download these:
+https://youtube.com/watch?v=aaa
+https://youtube.com/watch?v=bbb
+https://youtube.com/watch?v=ccc
+```
+
 ## Disclaimer
 
 This software is provided for lawful use only. The authors are not responsible for any misuse.

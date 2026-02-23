@@ -125,6 +125,35 @@ Tempel URL media atau katakan "unduh ini" di percakapan Claude Code mana pun. Sk
 3. Menanyakan apa yang Anda inginkan (video/audio, kualitas, lokasi penyimpanan)
 4. Mengunduh media
 
+## Fitur AI
+
+### Analisis URL Halaman
+
+Anda tidak perlu mencari URL langsung video. Cukup tempel URL halaman tempat video tertanam, dan AI akan:
+
+1. Menganalisis halaman untuk menemukan video yang tertanam
+2. Menampilkan yang ditemukan (jika ada beberapa, memungkinkan Anda memilih)
+3. Mengunduh video yang dipilih
+
+Berfungsi dengan Claude Code dan OpenClaw.
+
+**Contoh:**
+```
+Simpan video dari https://example.com/blog/my-post
+```
+
+### Unduhan Batch
+
+Tempel beberapa URL sekaligus. AI menanyakan preferensi Anda (video/audio, kualitas) hanya sekali dan menerapkannya ke semua unduhan.
+
+**Contoh:**
+```
+Unduh ini:
+https://youtube.com/watch?v=aaa
+https://youtube.com/watch?v=bbb
+https://youtube.com/watch?v=ccc
+```
+
 ## Penafian
 
 Perangkat lunak ini disediakan hanya untuk penggunaan yang sah. Penulis tidak bertanggung jawab atas penyalahgunaan apa pun.

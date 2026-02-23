@@ -125,6 +125,35 @@ ytdl "URL" -- --limit-rate 1M                                       # 传递 yt-
 3. 询问您的需求（视频/音频、画质、保存位置）
 4. 执行下载
 
+## AI 功能
+
+### 页面URL分析
+
+无需自己查找视频的直接URL。只需粘贴包含视频的网页URL，AI 会：
+
+1. 分析页面以查找嵌入的视频
+2. 展示找到的视频（如有多个，可供选择）
+3. 下载选定的视频
+
+适用于 Claude Code 和 OpenClaw。
+
+**示例：**
+```
+保存 https://example.com/blog/my-post 中的视频
+```
+
+### 批量下载
+
+一次粘贴多个URL。AI 只问一次偏好设置（视频/音频、画质），然后应用到所有下载。
+
+**示例：**
+```
+下载这些：
+https://youtube.com/watch?v=aaa
+https://youtube.com/watch?v=bbb
+https://youtube.com/watch?v=ccc
+```
+
 ## 免责声明
 
 本软件仅供合法使用。作者不对任何滥用行为负责。

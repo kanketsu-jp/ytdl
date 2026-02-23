@@ -125,6 +125,35 @@ Cole uma URL de mídia ou diga "baixe isso" em qualquer conversa do Claude Code.
 3. Pergunta o que você deseja (vídeo/áudio, qualidade, local de salvamento)
 4. Faz o download
 
+## Recursos IA
+
+### Análise de URL de página
+
+Não é necessário encontrar a URL direta do vídeo. Basta colar a URL da página onde o vídeo está incorporado, e a IA irá:
+
+1. Analisar a página para encontrar vídeos incorporados
+2. Mostrar o que foi encontrado (se houver vários, permite escolher)
+3. Baixar o(s) vídeo(s) selecionado(s)
+
+Funciona com Claude Code e OpenClaw.
+
+**Exemplo:**
+```
+Salve o vídeo de https://example.com/blog/my-post
+```
+
+### Downloads em lote
+
+Cole múltiplas URLs de uma vez. A IA pergunta suas preferências (vídeo/áudio, qualidade) apenas uma vez e aplica a todos os downloads.
+
+**Exemplo:**
+```
+Baixe estes:
+https://youtube.com/watch?v=aaa
+https://youtube.com/watch?v=bbb
+https://youtube.com/watch?v=ccc
+```
+
 ## Isenção de responsabilidade
 
 Este software é fornecido apenas para uso legal. Os autores não são responsáveis por qualquer uso indevido.
