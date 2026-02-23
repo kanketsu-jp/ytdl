@@ -135,7 +135,7 @@ Não é necessário encontrar a URL direta do vídeo. Basta colar a URL da pági
 2. Mostrar o que foi encontrado (se houver vários, permite escolher)
 3. Baixar o(s) vídeo(s) selecionado(s)
 
-Funciona com Claude Code e OpenClaw.
+Funciona com Claude Code.
 
 **Exemplo:**
 ```

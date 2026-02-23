@@ -19,24 +19,6 @@ skills/
 .claude-plugin/
   plugin.json                   # Claude Code plugin manifest
   marketplace.json              # Marketplace catalog
-openclaw/
-  setup/SKILL.md                # OpenClaw skill (one-click environment setup)
-  acquire-and-share/SKILL.md    # OpenClaw skill (DL→MinIO→share pipeline)
-scripts/
-  setup_environment.sh          # Environment bootstrap (Docker, MinIO, mc)
-  acquire_and_share.sh          # DL→upload→share pipeline (OpenClaw exec entry)
-  lib/
-    common.sh                   # Shared utilities (colors, logging, JSON, config)
-    validate_url.sh             # URL validation (injection prevention)
-    minio_upload.sh             # MinIO upload functions
-    minio_presign.sh            # MinIO presigned URL generation
-    filebrowser_share.sh        # FileBrowser REST API share link generation
-  config/
-    default.env                 # Default configuration
-docker/
-  docker-compose.yml            # MinIO + FileBrowser
-  filebrowser/settings.json     # FileBrowser config
-  .env.example                  # Docker env template
 ```
 
 ## How It Works
@@ -89,33 +71,3 @@ ytdl [options] <URL> [-- yt-dlp-options...]
 
 Adding an option → update: `bin/ytdl.sh` (while/case + show_help + i18n vars), `lib/interactive.js`, `lib/build-args.js`, `lib/i18n.js` (ja/en keys), `skills/download/SKILL.md`
 
-Changing batch/pipeline behavior → update: `scripts/acquire_and_share.sh`, `openclaw/acquire-and-share/SKILL.md`, `skills/download/SKILL.md`
-
-## OpenClaw Integration
-
-The `openclaw/` directory contains skills for OpenClaw agent integration:
-
-- `openclaw/setup/SKILL.md` — One-click environment setup (Docker, MinIO, FileBrowser)
-- `openclaw/acquire-and-share/SKILL.md` — Download media and generate shareable links
-
-### One-Click Setup (OpenClaw)
-
-OpenClaw users can set up the entire ytdl environment by passing this skill URL:
-```
-https://raw.githubusercontent.com/kanketsu-jp/ytdl/main/openclaw/setup/SKILL.md
-```
-The skill automates: npm install, Docker services, MinIO/FileBrowser configuration, and verification.
-
-### Scripts
-
-The main entry point is `scripts/acquire_and_share.sh` which handles the full pipeline:
-1. Validate URL
-2. Download media via `bin/ytdl.sh`
-3. Upload to MinIO
-4. Generate shareable links (presign or FileBrowser)
-
-Use `scripts/setup_environment.sh` to manage the Docker environment:
-- `--check`: Verify all tools and services
-- `--setup`: Initialize complete environment
-- `--teardown`: Stop Docker services
-- `--status`: Check service status

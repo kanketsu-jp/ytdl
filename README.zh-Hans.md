@@ -135,7 +135,7 @@ ytdl "URL" -- --limit-rate 1M                                       # 传递 yt-
 2. 展示找到的视频（如有多个，可供选择）
 3. 下载选定的视频
 
-适用于 Claude Code 和 OpenClaw。
+适用于 Claude Code。
 
 **示例：**
 ```

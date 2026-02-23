@@ -135,7 +135,7 @@ Anda tidak perlu mencari URL langsung video. Cukup tempel URL halaman tempat vid
 2. Menampilkan yang ditemukan (jika ada beberapa, memungkinkan Anda memilih)
 3. Mengunduh video yang dipilih
 
-Berfungsi dengan Claude Code dan OpenClaw.
+Berfungsi dengan Claude Code.
 
 **Contoh:**
 ```

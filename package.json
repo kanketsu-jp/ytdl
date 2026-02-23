@@ -13,10 +13,7 @@
     "cli.js",
     "bin/",
     "lib/",
-    "skills/",
-    "scripts/",
-    "docker/",
-    "openclaw/"
+    "skills/"
   ],
   "keywords": [
     "media",

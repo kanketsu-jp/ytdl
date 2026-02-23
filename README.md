@@ -135,7 +135,7 @@ You don't need to find the direct video URL yourself. Just paste the page URL wh
 2. Show you what was found (if multiple, lets you choose)
 3. Download the selected video(s)
 
-Works with Claude Code and OpenClaw.
+Works with Claude Code.
 
 **Example:**
 ```
