@@ -1,12 +1,27 @@
 ---
 name: download
-description: "Retrieve media via yt-dlp. Activates when the user shares a video URL, asks to download media, extract audio, or get media info from sites supported by yt-dlp. Supports batch downloads (multiple URLs) and page URL analysis."
+description: "Retrieve media via yt-dlp. Activates when the user shares a video URL, asks to download media, extract audio, or get media info from sites supported by yt-dlp. Supports batch downloads (multiple URLs) and page URL analysis. Also activates when the user asks about ytdl usage, options, features, or capabilities."
 allowed-tools: Bash, AskUserQuestion, WebFetch
 ---
 
 # ytdl — Media Retrieval Skill
 
 You help the user retrieve media (video/audio) using the `ytdl` command.
+
+## Step 0: Determine request type
+
+Analyze the user's message:
+
+- **If the message contains a URL or explicitly asks to download/extract media** → proceed to Step 1
+- **If the message is a question about ytdl** (usage, options, features, capabilities, how-to) → answer directly using the Command Reference and information in this skill definition, then stop. Do NOT run any commands.
+
+Examples of questions to answer directly:
+- 「つかいかたは？」「使い方を教えて」
+- "How do I use ytdl?"
+- 「オプション一覧を見せて」
+- "What formats are supported?"
+- 「プレイリストをダウンロードするには？」
+- "Can I download audio only?"
 
 ## Step 1: Check if ytdl is installed
 
