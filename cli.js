@@ -5,7 +5,7 @@ import path from "node:path";
 import * as p from "@clack/prompts";
 import pc from "picocolors";
 import { checkDeps } from "./lib/check-deps.js";
-import { interactive } from "./lib/interactive.js";
+import { interactive, isCancelled } from "./lib/interactive.js";
 import { buildArgs } from "./lib/build-args.js";
 import { t, currentLang } from "./lib/i18n.js";
 import { routeUrl } from "./lib/router.js";
@@ -156,7 +156,7 @@ async function run() {
   p.intro(pc.cyan("ytdl"));
 
   const opts = await interactive();
-  if (p.isCancel(opts)) {
+  if (isCancelled(opts)) {
     p.cancel(t.cancelled);
     process.exit(0);
   }
