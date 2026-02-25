@@ -67,11 +67,11 @@ ytdl
 
 ```bash
 # Sitios de video (yt-dlp, más de 1000 sitios)
-ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"        # mejor calidad + miniatura + subtítulos + descripción
-ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"     # solo audio (m4a)
-ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc" # 720p
-ytdl -p "https://www.youtube.com/playlist?list=..."        # playlist
-ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"     # solo información (sin descarga)
+ytdl "https://example.com/watch?v=VIDEO_ID"        # mejor calidad + miniatura + subtítulos + descripción
+ytdl -a "https://example.com/watch?v=VIDEO_ID"     # solo audio (m4a)
+ytdl -q 720 "https://example.com/watch?v=VIDEO_ID" # 720p
+ytdl -p "https://example.com/playlist?list=..."     # playlist
+ytdl -i "https://example.com/watch?v=VIDEO_ID"     # solo información (sin descarga)
 
 # Torrent / P2P
 ytdl "magnet:?xt=urn:btih:..."                            # enlace magnet (auto-detectado)
@@ -173,7 +173,7 @@ Pegue cualquier URL de medios (sitio de video, enlace magnet, URL de stream) o d
 ### Detección universal de URL
 
 Solo pegue cualquier URL — ytdl enruta automáticamente al backend correcto:
-- YouTube, Vimeo, Twitter, etc. → yt-dlp
+- Sitios de video (1000+ compatibles) → yt-dlp
 - enlaces `magnet:` → Torrent (webtorrent)
 - `rtmp://`, `rtsp://` → captura de stream (ffmpeg)
 - página con video incrustado → analizador de sitios
@@ -200,8 +200,8 @@ Pegue múltiples URLs a la vez. La IA pregunta sus preferencias (video/audio, ca
 **Ejemplo:**
 ```
 Descarga estos:
-https://youtube.com/watch?v=aaa
-https://youtube.com/watch?v=bbb
+https://example.com/watch?v=aaa
+https://example.com/watch?v=bbb
 magnet:?xt=urn:btih:ccc
 ```
 

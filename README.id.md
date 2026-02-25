@@ -67,11 +67,11 @@ ytdl
 
 ```bash
 # Situs video (yt-dlp, 1000+ situs)
-ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"        # kualitas terbaik + thumbnail + subtitle + deskripsi
-ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"     # audio saja (m4a)
-ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc" # 720p
-ytdl -p "https://www.youtube.com/playlist?list=..."        # playlist
-ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"     # info saja (tanpa unduh)
+ytdl "https://example.com/watch?v=VIDEO_ID"        # kualitas terbaik + thumbnail + subtitle + deskripsi
+ytdl -a "https://example.com/watch?v=VIDEO_ID"     # audio saja (m4a)
+ytdl -q 720 "https://example.com/watch?v=VIDEO_ID" # 720p
+ytdl -p "https://example.com/playlist?list=..."     # playlist
+ytdl -i "https://example.com/watch?v=VIDEO_ID"     # info saja (tanpa unduh)
 
 # Torrent / P2P
 ytdl "magnet:?xt=urn:btih:..."                            # tautan magnet (auto-deteksi)
@@ -173,7 +173,7 @@ Tempel URL media apa pun (situs video, tautan magnet, URL stream) atau katakan "
 ### Deteksi URL Universal
 
 Cukup tempel URL apa pun — ytdl secara otomatis merutekan ke backend yang benar:
-- YouTube, Vimeo, Twitter, dll. → yt-dlp
+- Situs video (1000+ didukung) → yt-dlp
 - tautan `magnet:` → Torrent (webtorrent)
 - `rtmp://`, `rtsp://` → capture stream (ffmpeg)
 - halaman dengan video tertanam → penganalisis situs
@@ -200,8 +200,8 @@ Tempel beberapa URL sekaligus. AI menanyakan preferensi Anda (video/audio, kuali
 **Contoh:**
 ```
 Unduh ini:
-https://youtube.com/watch?v=aaa
-https://youtube.com/watch?v=bbb
+https://example.com/watch?v=aaa
+https://example.com/watch?v=bbb
 magnet:?xt=urn:btih:ccc
 ```
 

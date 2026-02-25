@@ -67,11 +67,11 @@ ytdl
 
 ```bash
 # वीडियो साइट्स (yt-dlp, 1000+ साइट्स)
-ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"        # सर्वश्रेष्ठ गुणवत्ता + थंबनेल + उपशीर्षक + विवरण
-ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"     # केवल ऑडियो (m4a)
-ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc" # 720p
-ytdl -p "https://www.youtube.com/playlist?list=..."        # प्लेलिस्ट
-ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"     # केवल जानकारी (डाउनलोड नहीं)
+ytdl "https://example.com/watch?v=VIDEO_ID"        # सर्वश्रेष्ठ गुणवत्ता + थंबनेल + उपशीर्षक + विवरण
+ytdl -a "https://example.com/watch?v=VIDEO_ID"     # केवल ऑडियो (m4a)
+ytdl -q 720 "https://example.com/watch?v=VIDEO_ID" # 720p
+ytdl -p "https://example.com/playlist?list=..."     # प्लेलिस्ट
+ytdl -i "https://example.com/watch?v=VIDEO_ID"     # केवल जानकारी (डाउनलोड नहीं)
 
 # Torrent / P2P
 ytdl "magnet:?xt=urn:btih:..."                            # मैग्नेट लिंक (स्वतः पहचान)
@@ -173,7 +173,7 @@ Claude Code की बातचीत में कोई भी मीडिय
 ### सार्वभौमिक URL पहचान
 
 कोई भी URL पेस्ट करें — ytdl स्वतः सही बैकेंड पर रूट करता है:
-- YouTube, Vimeo, Twitter आदि → yt-dlp
+- वीडियो साइट्स (1000+ समर्थित) → yt-dlp
 - `magnet:` लिंक → Torrent (webtorrent)
 - `rtmp://`, `rtsp://` → स्ट्रीम कैप्चर (ffmpeg)
 - एम्बेडेड वीडियो वाला पेज → साइट विश्लेषक
@@ -200,8 +200,8 @@ https://example.com/blog/my-post से वीडियो सेव करो
 **उदाहरण:**
 ```
 ये डाउनलोड करो:
-https://youtube.com/watch?v=aaa
-https://youtube.com/watch?v=bbb
+https://example.com/watch?v=aaa
+https://example.com/watch?v=bbb
 magnet:?xt=urn:btih:ccc
 ```
 

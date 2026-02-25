@@ -65,7 +65,7 @@ Collect all URLs from the user's message and classify each:
   2. Look for embedded video URLs:
      - `<video>` / `<iframe>` elements with `src` attributes
      - `og:video` / `og:video:url` meta tags
-     - YouTube/Vimeo/other embed URLs in the page source
+     - Video embed URLs in the page source
      - JSON-LD `VideoObject` schema
   3. If found, present the video URLs to the user and ask which to download
   4. If not found, try `ytdl --analyze "URL"` (site analyzer backend)

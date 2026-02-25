@@ -67,11 +67,11 @@ ytdl
 
 ```bash
 # Video sites (yt-dlp, 1000+ sites)
-ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"        # best quality + thumbnail + subs + description
-ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"     # audio only (m4a)
-ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc" # 720p cap
-ytdl -p "https://www.youtube.com/playlist?list=..."        # playlist
-ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"     # info only (no download)
+ytdl "https://example.com/watch?v=VIDEO_ID"        # best quality + thumbnail + subs + description
+ytdl -a "https://example.com/watch?v=VIDEO_ID"     # audio only (m4a)
+ytdl -q 720 "https://example.com/watch?v=VIDEO_ID" # 720p cap
+ytdl -p "https://example.com/playlist?list=..."     # playlist
+ytdl -i "https://example.com/watch?v=VIDEO_ID"     # info only (no download)
 
 # Torrent / P2P
 ytdl "magnet:?xt=urn:btih:..."                            # magnet link (auto-detected)
@@ -173,7 +173,7 @@ Paste any media URL (video site, magnet link, stream URL) or say "download this"
 ### Universal URL Detection
 
 Just paste any URL — ytdl automatically routes to the right backend:
-- YouTube, Vimeo, Twitter, etc. → yt-dlp
+- Video sites (1000+ supported) → yt-dlp
 - `magnet:` links → torrent (webtorrent)
 - `rtmp://`, `rtsp://` → stream capture (ffmpeg)
 - Page with embedded video → site analyzer
@@ -200,8 +200,8 @@ Paste multiple URLs at once. The AI asks your preferences (video/audio, quality)
 **Example:**
 ```
 Download these:
-https://youtube.com/watch?v=aaa
-https://youtube.com/watch?v=bbb
+https://example.com/watch?v=aaa
+https://example.com/watch?v=bbb
 magnet:?xt=urn:btih:ccc
 ```
 

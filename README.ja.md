@@ -67,11 +67,11 @@ ytdl
 
 ```bash
 # 動画サイト（yt-dlp、1000以上のサイト対応）
-ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"        # 最高画質＋サムネ＋字幕＋説明文
-ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"     # 音声のみ (m4a)
-ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc" # 720p
-ytdl -p "https://www.youtube.com/playlist?list=..."        # プレイリスト一括
-ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"     # 情報のみ（ダウンロードしない）
+ytdl "https://example.com/watch?v=VIDEO_ID"        # 最高画質＋サムネ＋字幕＋説明文
+ytdl -a "https://example.com/watch?v=VIDEO_ID"     # 音声のみ (m4a)
+ytdl -q 720 "https://example.com/watch?v=VIDEO_ID" # 720p
+ytdl -p "https://example.com/playlist?list=..."     # プレイリスト一括
+ytdl -i "https://example.com/watch?v=VIDEO_ID"     # 情報のみ（ダウンロードしない）
 
 # Torrent / P2P
 ytdl "magnet:?xt=urn:btih:..."                            # マグネットリンク（自動検出）
@@ -173,7 +173,7 @@ Claude Code の会話でメディアの URL を貼るか「ダウンロードし
 ### 汎用URL検出
 
 URLをそのまま貼るだけで、ytdl が自動的に適切なバックエンドにルーティングします:
-- YouTube、Vimeo、Twitter 等 → yt-dlp
+- 動画サイト（1000以上対応） → yt-dlp
 - `magnet:` リンク → Torrent（webtorrent）
 - `rtmp://`、`rtsp://` → ストリームキャプチャ（ffmpeg）
 - 動画が埋め込まれたページ → サイト解析
@@ -200,8 +200,8 @@ https://example.com/blog/my-post の動画を保存して
 **例:**
 ```
 これらをダウンロードして:
-https://youtube.com/watch?v=aaa
-https://youtube.com/watch?v=bbb
+https://example.com/watch?v=aaa
+https://example.com/watch?v=bbb
 magnet:?xt=urn:btih:ccc
 ```
 

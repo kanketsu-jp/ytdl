@@ -67,11 +67,11 @@ ytdl
 
 ```bash
 # 视频网站（yt-dlp，支持 1000+ 网站）
-ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"        # 最高画质 + 缩略图 + 字幕 + 描述
-ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"     # 仅音频 (m4a)
-ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc" # 720p
-ytdl -p "https://www.youtube.com/playlist?list=..."        # 播放列表
-ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"     # 仅信息（不下载）
+ytdl "https://example.com/watch?v=VIDEO_ID"        # 最高画质 + 缩略图 + 字幕 + 描述
+ytdl -a "https://example.com/watch?v=VIDEO_ID"     # 仅音频 (m4a)
+ytdl -q 720 "https://example.com/watch?v=VIDEO_ID" # 720p
+ytdl -p "https://example.com/playlist?list=..."     # 播放列表
+ytdl -i "https://example.com/watch?v=VIDEO_ID"     # 仅信息（不下载）
 
 # Torrent / P2P
 ytdl "magnet:?xt=urn:btih:..."                            # 磁力链接（自动检测）
@@ -173,7 +173,7 @@ yt-dlp 后端封装 `bin/ytdl.sh`（与 v1 相同）。新后端完全在 `lib/b
 ### 通用 URL 检测
 
 直接粘贴任意 URL，ytdl 会自动路由到正确的后端：
-- YouTube、Vimeo、Twitter 等 → yt-dlp
+- 视频网站（支持 1000+ 站点） → yt-dlp
 - `magnet:` 链接 → Torrent（webtorrent）
 - `rtmp://`、`rtsp://` → 流媒体抓取（ffmpeg）
 - 包含嵌入视频的页面 → 网站分析
@@ -200,8 +200,8 @@ yt-dlp 后端封装 `bin/ytdl.sh`（与 v1 相同）。新后端完全在 `lib/b
 **示例：**
 ```
 下载这些：
-https://youtube.com/watch?v=aaa
-https://youtube.com/watch?v=bbb
+https://example.com/watch?v=aaa
+https://example.com/watch?v=bbb
 magnet:?xt=urn:btih:ccc
 ```
 

@@ -67,11 +67,11 @@ ytdl
 
 ```bash
 # Sites de vídeo (yt-dlp, mais de 1000 sites)
-ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"        # melhor qualidade + miniatura + legendas + descrição
-ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"     # somente áudio (m4a)
-ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc" # 720p
-ytdl -p "https://www.youtube.com/playlist?list=..."        # playlist
-ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"     # apenas informações (sem download)
+ytdl "https://example.com/watch?v=VIDEO_ID"        # melhor qualidade + miniatura + legendas + descrição
+ytdl -a "https://example.com/watch?v=VIDEO_ID"     # somente áudio (m4a)
+ytdl -q 720 "https://example.com/watch?v=VIDEO_ID" # 720p
+ytdl -p "https://example.com/playlist?list=..."     # playlist
+ytdl -i "https://example.com/watch?v=VIDEO_ID"     # apenas informações (sem download)
 
 # Torrent / P2P
 ytdl "magnet:?xt=urn:btih:..."                            # link magnet (auto-detectado)
@@ -173,7 +173,7 @@ Cole qualquer URL de mídia (site de vídeo, link magnet, URL de stream) ou diga
 ### Detecção universal de URL
 
 Basta colar qualquer URL — ytdl roteia automaticamente para o backend correto:
-- YouTube, Vimeo, Twitter, etc. → yt-dlp
+- Sites de vídeo (1000+ suportados) → yt-dlp
 - links `magnet:` → Torrent (webtorrent)
 - `rtmp://`, `rtsp://` → captura de stream (ffmpeg)
 - página com vídeo incorporado → analisador de sites
@@ -200,8 +200,8 @@ Cole múltiplas URLs de uma vez. A IA pergunta suas preferências (vídeo/áudio
 **Exemplo:**
 ```
 Baixe estes:
-https://youtube.com/watch?v=aaa
-https://youtube.com/watch?v=bbb
+https://example.com/watch?v=aaa
+https://example.com/watch?v=bbb
 magnet:?xt=urn:btih:ccc
 ```
 
