@@ -1019,7 +1019,7 @@ if [[ "$INFO_ONLY" == true ]]; then
   echo "${LINE}"
   echo ""
 
-  YT_ARGS=(--ignore-config --dump-json --no-download)
+  YT_ARGS=(--ignore-config --dump-json --no-download --no-playlist)
   if [[ "$NO_COOKIE" == false ]]; then
     YT_ARGS+=(--cookies-from-browser "$BROWSER")
   fi
