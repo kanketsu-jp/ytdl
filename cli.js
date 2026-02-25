@@ -112,11 +112,12 @@ if (argv.includes("-h") || argv.includes("--help")) {
     }
 
     // デフォルト: 既存の ytdlp フロー（bin/ytdl.sh に直接パス）
+    const isInfoOnly = argv.includes("-i");
     const child = spawn("bash", [SCRIPT, "--lang", currentLang, ...argv], {
       stdio: "inherit",
     });
     child.on("close", async (code) => {
-      if (code === 0) await onDownloadSuccess(cliOutputDir);
+      if (code === 0 && !isInfoOnly) await onDownloadSuccess(cliOutputDir);
       process.exit(code ?? 0);
     });
   });
