@@ -57,7 +57,10 @@ if (argv.includes("-h") || argv.includes("--help")) {
   // Has arguments — route to appropriate backend
   checkDeps().then(async () => {
     // URL 引数の抽出（フラグ以外の最後の引数をURLと見なす）
-    const urlArg = argv.find((a) => !a.startsWith("-"));
+    // シェルのバックスラッシュエスケープ（\? \= \& 等）を除去して argv も更新
+    const rawUrlIdx = argv.findIndex((a) => !a.startsWith("-"));
+    const urlArg = rawUrlIdx !== -1 ? argv[rawUrlIdx].replace(/\\([?=&])/g, "$1") : null;
+    if (rawUrlIdx !== -1) argv[rawUrlIdx] = urlArg;
 
     // -o フラグから出力ディレクトリを取得
     const oIdx = argv.indexOf("-o");
