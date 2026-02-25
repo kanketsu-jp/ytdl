@@ -2,7 +2,7 @@
 
 > 🇺🇸 [English](./README.md) | 🇯🇵 **日本語** | 🇨🇳 [简体中文](./README.zh-Hans.md) | 🇪🇸 [Español](./README.es.md) | 🇮🇳 [हिन्दी](./README.hi.md) | 🇧🇷 [Português](./README.pt.md) | 🇮🇩 [Bahasa Indonesia](./README.id.md)
 
-[yt-dlp](https://github.com/yt-dlp/yt-dlp) ベースのメディア取得 CLI。インタラクティブ UI + AI ネイティブ（Claude Code プラグイン）。
+開発者向けの汎用メディア取得 CLI。[yt-dlp](https://github.com/yt-dlp/yt-dlp)（動画サイト）、Torrent（P2P）、RTMP/RTSP ストリームなど多様なソースに対応。インタラクティブ UI + AI ネイティブ（Claude Code プラグイン）。
 
 ## コンプライアンス・法的事項
 
@@ -66,13 +66,32 @@ ytdl
 ### コマンドモード
 
 ```bash
-ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"                 # 最高画質＋サムネ＋字幕＋説明文
-ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"              # 音声のみ (m4a)
-ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc"          # 720p
-ytdl -p "https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf" # プレイリスト一括
-ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"              # 情報のみ
-ytdl -a -o ~/Music "https://www.youtube.com/watch?v=BaW_jenozKc"   # 音声を~/Musicに
-ytdl "URL" -- --limit-rate 1M                                       # yt-dlpオプション直渡し
+# 動画サイト（yt-dlp、1000以上のサイト対応）
+ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"        # 最高画質＋サムネ＋字幕＋説明文
+ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"     # 音声のみ (m4a)
+ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc" # 720p
+ytdl -p "https://www.youtube.com/playlist?list=..."        # プレイリスト一括
+ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"     # 情報のみ（ダウンロードしない）
+
+# Torrent / P2P
+ytdl "magnet:?xt=urn:btih:..."                            # マグネットリンク（自動検出）
+ytdl "https://example.com/file.torrent"                   # .torrent URL（自動検出）
+
+# RTMP / RTSP ストリーム
+ytdl "rtmp://live.example.com/stream/key"                 # RTMP ライブ配信
+ytdl "rtsp://camera.example.com/feed"                     # RTSP カメラ映像
+ytdl --duration 60 "rtmp://..."                           # 60秒録画
+
+# サイト解析（yt-dlp で取得できない場合）
+ytdl --analyze "https://example.com/page-with-video"      # サイト解析モードを強制
+
+# バックエンドを強制指定
+ytdl --via torrent "magnet:?xt=..."
+ytdl --via stream "rtmp://..."
+ytdl --via ytdlp "https://..."
+
+# yt-dlp オプション直渡し
+ytdl "URL" -- --limit-rate 1M
 ```
 
 ## オプション
@@ -86,10 +105,32 @@ ytdl "URL" -- --limit-rate 1M                                       # yt-dlpオ�
 | `-b <ブラウザ>` | クッキー取得元 | off |
 | `-n` | クッキーなし（デフォルト） | on |
 | `-i` | 情報のみ | off |
+| `-t` | ダウンロード後に文字起こし | off |
+| `--backend <b>` | 文字起こしバックエンド (local/api) | local |
+| `--manuscript <path>` | 原稿ファイルパス（精度向上用） | - |
 | `--lang <code>` | 言語（`ja`/`en`/`zh-Hans`/`es`/`hi`/`pt`/`id`） | `ja` |
+| `--via <backend>` | バックエンド指定（ytdlp/torrent/stream/analyzer） | 自動 |
+| `--analyze` | サイト解析モードを強制 | off |
+| `--duration <秒>` | ストリーム録画時間（秒） | 停止まで |
 | `--` | 以降をyt-dlpに渡す | - |
 
 デフォルトではブラウザのクッキーを使いません。制限付きコンテンツ（年齢制限、メンバー限定等）には `-b <ブラウザ>` を使用してください。
+
+## アーキテクチャ
+
+ytdl は URL の種別から自動でバックエンドを選択します:
+
+```
+ytdl CLI
+  │
+  ├── magnet: / .torrent  → Torrent バックエンド（webtorrent P2P）
+  ├── rtmp:// / rtsp://   → ストリームバックエンド（ffmpeg spawn）
+  ├── --analyze フラグ    → サイト解析バックエンド（Chrome CDP）
+  └── http(s)://          → yt-dlp バックエンド（1000以上のサイト）
+                               └── 失敗時 → サイト解析にフォールバック
+```
+
+yt-dlp バックエンドは `bin/ytdl.sh`（v1 から変更なし）をラップします。新バックエンドは `lib/backends/` に実装されています。
 
 ## 出力構造
 
@@ -100,14 +141,15 @@ ytdl "URL" -- --limit-rate 1M                                       # yt-dlpオ�
           ├── タイトル.mp4
           ├── タイトル.jpg           # サムネイル
           ├── タイトル.ja.srt        # 字幕
-          └── タイトル.description   # 説明文
+          ├── タイトル.description.txt   # 説明文
+          └── ytdl_20250226_1234.log     # ログ
 ```
 
 ---
 
 ## Claude Code プラグイン
 
-ytdl を Claude Code のスキルとして使える。Claude が AskUserQuestion で対話的にダウンロード内容を確認してくれる。
+ytdl を Claude Code のスキルとして使える。Claude が AskUserQuestion で対話的にダウンロード内容を確認してくれます。動画サイト、マグネットリンク、RTMP/RTSP ストリーム、サイト解析に対応。
 
 ### インストール
 
@@ -121,11 +163,20 @@ ytdl を Claude Code のスキルとして使える。Claude が AskUserQuestion
 Claude Code の会話でメディアの URL を貼るか「ダウンロードして」と言うだけ。スキルが自動で発動して:
 
 1. `ytdl` がインストールされてなければインストールを提案
-2. メディア情報を取得して表示
-3. 何が欲しいか聞く（動画/音声、画質、保存先）
-4. ダウンロード実行
+2. URL の種別を判定して適切なバックエンドを選択
+3. メディア情報を取得して表示（可能な場合）
+4. 何が欲しいか聞く（動画/音声、画質、保存先）
+5. ダウンロード実行
 
 ## AI 機能
+
+### 汎用URL検出
+
+URLをそのまま貼るだけで、ytdl が自動的に適切なバックエンドにルーティングします:
+- YouTube、Vimeo、Twitter 等 → yt-dlp
+- `magnet:` リンク → Torrent（webtorrent）
+- `rtmp://`、`rtsp://` → ストリームキャプチャ（ffmpeg）
+- 動画が埋め込まれたページ → サイト解析
 
 ### ページURL解析
 
@@ -151,7 +202,7 @@ https://example.com/blog/my-post の動画を保存して
 これらをダウンロードして:
 https://youtube.com/watch?v=aaa
 https://youtube.com/watch?v=bbb
-https://youtube.com/watch?v=ccc
+magnet:?xt=urn:btih:ccc
 ```
 
 ## 免責事項

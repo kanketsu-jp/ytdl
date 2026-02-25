@@ -2,7 +2,7 @@
 
 > 🇺🇸 [English](./README.md) | 🇯🇵 [日本語](./README.ja.md) | 🇨🇳 [简体中文](./README.zh-Hans.md) | 🇪🇸 [Español](./README.es.md) | 🇮🇳 [हिन्दी](./README.hi.md) | 🇧🇷 [Português](./README.pt.md) | 🇮🇩 **Bahasa Indonesia**
 
-CLI unduh media berbasis [yt-dlp](https://github.com/yt-dlp/yt-dlp). UI interaktif + AI native (plugin Claude Code).
+CLI unduh media universal untuk pengembang. Mengunduh dari situs video via [yt-dlp](https://github.com/yt-dlp/yt-dlp), torrent (P2P), stream RTMP/RTSP, dan lainnya. UI interaktif + AI native (plugin Claude Code).
 
 ## Kepatuhan & Pemberitahuan Hukum
 
@@ -66,13 +66,32 @@ ytdl
 ### Mode perintah
 
 ```bash
-ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"                 # kualitas terbaik + thumbnail + subtitle + deskripsi
-ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"              # audio saja (m4a)
-ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc"          # 720p
-ytdl -p "https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf" # playlist
-ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"              # info saja
-ytdl -a -o ~/Music "https://www.youtube.com/watch?v=BaW_jenozKc"   # audio ke ~/Music
-ytdl "URL" -- --limit-rate 1M                                       # opsi yt-dlp
+# Situs video (yt-dlp, 1000+ situs)
+ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"        # kualitas terbaik + thumbnail + subtitle + deskripsi
+ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"     # audio saja (m4a)
+ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc" # 720p
+ytdl -p "https://www.youtube.com/playlist?list=..."        # playlist
+ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"     # info saja (tanpa unduh)
+
+# Torrent / P2P
+ytdl "magnet:?xt=urn:btih:..."                            # tautan magnet (auto-deteksi)
+ytdl "https://example.com/file.torrent"                   # URL .torrent (auto-deteksi)
+
+# Stream RTMP / RTSP
+ytdl "rtmp://live.example.com/stream/key"                 # stream RTMP langsung
+ytdl "rtsp://camera.example.com/feed"                     # kamera RTSP
+ytdl --duration 60 "rtmp://..."                           # rekam 60 detik
+
+# Penganalisis situs (ketika yt-dlp tidak dapat memperoleh media)
+ytdl --analyze "https://example.com/page-with-video"      # paksa mode analisis situs
+
+# Paksa backend tertentu
+ytdl --via torrent "magnet:?xt=..."
+ytdl --via stream "rtmp://..."
+ytdl --via ytdlp "https://..."
+
+# Teruskan opsi langsung ke yt-dlp
+ytdl "URL" -- --limit-rate 1M
 ```
 
 ## Opsi
@@ -86,10 +105,32 @@ ytdl "URL" -- --limit-rate 1M                                       # opsi yt-dl
 | `-b <browser>` | Browser cookie | off |
 | `-n` | Tanpa cookie (default) | on |
 | `-i` | Info saja | off |
+| `-t` | Transkrip setelah unduh | off |
+| `--backend <b>` | Backend transkripsi (local/api) | local |
+| `--manuscript <path>` | Path file manuskrip (untuk akurasi) | - |
 | `--lang <code>` | Bahasa (`ja`/`en`/`zh-Hans`/`es`/`hi`/`pt`/`id`) | `ja` |
+| `--via <backend>` | Tentukan backend (ytdlp/torrent/stream/analyzer) | otomatis |
+| `--analyze` | Paksa mode penganalisis situs | off |
+| `--duration <detik>` | Durasi rekaman stream (detik) | sampai dihentikan |
 | `--` | Teruskan ke yt-dlp | - |
 
 Secara default, ytdl berjalan tanpa cookie browser. Gunakan `-b <browser>` untuk konten terbatas (batasan usia, khusus member, dll.).
+
+## Arsitektur
+
+ytdl secara otomatis mendeteksi backend yang tepat berdasarkan jenis URL:
+
+```
+ytdl CLI
+  │
+  ├── magnet: / .torrent  → Backend Torrent (webtorrent P2P)
+  ├── rtmp:// / rtsp://   → Backend stream (ffmpeg spawn)
+  ├── flag --analyze      → Backend penganalisis situs (Chrome CDP)
+  └── http(s)://          → Backend yt-dlp (1000+ situs)
+                               └── jika gagal → fallback penganalisis
+```
+
+Backend yt-dlp membungkus `bin/ytdl.sh` (tidak berubah sejak v1). Backend baru sepenuhnya ada di `lib/backends/`.
 
 ## Output
 
@@ -100,14 +141,15 @@ Secara default, ytdl berjalan tanpa cookie browser. Gunakan `-b <browser>` untuk
           ├── Judul.mp4
           ├── Judul.jpg           # thumbnail
           ├── Judul.id.srt        # subtitle
-          └── Judul.description
+          ├── Judul.description.txt
+          └── ytdl_20250226_1234.log
 ```
 
 ---
 
 ## Plugin Claude Code
 
-Gunakan ytdl sebagai skill Claude Code. Claude akan bertanya secara interaktif apa yang ingin diunduh menggunakan AskUserQuestion.
+Gunakan ytdl sebagai skill Claude Code. Claude akan bertanya secara interaktif apa yang ingin diunduh menggunakan AskUserQuestion. Mendukung situs video, tautan magnet, stream RTMP/RTSP, dan analisis situs.
 
 ### Instalasi
 
@@ -118,14 +160,23 @@ Gunakan ytdl sebagai skill Claude Code. Claude akan bertanya secara interaktif a
 
 ### Penggunaan
 
-Tempel URL media atau katakan "unduh ini" di percakapan Claude Code mana pun. Skill aktif secara otomatis dan:
+Tempel URL media apa pun (situs video, tautan magnet, URL stream) atau katakan "unduh ini" di percakapan Claude Code mana pun. Skill aktif secara otomatis dan:
 
 1. Memeriksa apakah `ytdl` terinstal (menawarkan instalasi jika belum)
-2. Mengambil info media
-3. Menanyakan apa yang Anda inginkan (video/audio, kualitas, lokasi penyimpanan)
-4. Mengunduh media
+2. Mendeteksi jenis URL dan memilih backend yang tepat
+3. Mengambil info media (bila berlaku)
+4. Menanyakan apa yang Anda inginkan (video/audio, kualitas, lokasi penyimpanan)
+5. Mengunduh media
 
 ## Fitur AI
+
+### Deteksi URL Universal
+
+Cukup tempel URL apa pun — ytdl secara otomatis merutekan ke backend yang benar:
+- YouTube, Vimeo, Twitter, dll. → yt-dlp
+- tautan `magnet:` → Torrent (webtorrent)
+- `rtmp://`, `rtsp://` → capture stream (ffmpeg)
+- halaman dengan video tertanam → penganalisis situs
 
 ### Analisis URL Halaman
 
@@ -151,7 +202,7 @@ Tempel beberapa URL sekaligus. AI menanyakan preferensi Anda (video/audio, kuali
 Unduh ini:
 https://youtube.com/watch?v=aaa
 https://youtube.com/watch?v=bbb
-https://youtube.com/watch?v=ccc
+magnet:?xt=urn:btih:ccc
 ```
 
 ## Penafian

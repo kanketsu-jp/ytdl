@@ -2,7 +2,7 @@
 
 > 🇺🇸 [English](./README.md) | 🇯🇵 [日本語](./README.ja.md) | 🇨🇳 [简体中文](./README.zh-Hans.md) | 🇪🇸 **Español** | 🇮🇳 [हिन्दी](./README.hi.md) | 🇧🇷 [Português](./README.pt.md) | 🇮🇩 [Bahasa Indonesia](./README.id.md)
 
-CLI de descarga de medios basado en [yt-dlp](https://github.com/yt-dlp/yt-dlp). UI interactiva + AI nativo (plugin de Claude Code).
+CLI universal de descarga de medios orientada a desarrolladores. Descarga desde sitios de video vía [yt-dlp](https://github.com/yt-dlp/yt-dlp), torrents (P2P), streams RTMP/RTSP y más. UI interactiva + AI nativo (plugin de Claude Code).
 
 ## Cumplimiento y aviso legal
 
@@ -66,13 +66,32 @@ ytdl
 ### Modo comando
 
 ```bash
-ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"                 # mejor calidad + miniatura + subtítulos + descripción
-ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"              # solo audio (m4a)
-ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc"          # 720p
-ytdl -p "https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf" # playlist
-ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"              # solo información
-ytdl -a -o ~/Music "https://www.youtube.com/watch?v=BaW_jenozKc"   # audio en ~/Music
-ytdl "URL" -- --limit-rate 1M                                       # opciones de yt-dlp
+# Sitios de video (yt-dlp, más de 1000 sitios)
+ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"        # mejor calidad + miniatura + subtítulos + descripción
+ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"     # solo audio (m4a)
+ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc" # 720p
+ytdl -p "https://www.youtube.com/playlist?list=..."        # playlist
+ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"     # solo información (sin descarga)
+
+# Torrent / P2P
+ytdl "magnet:?xt=urn:btih:..."                            # enlace magnet (auto-detectado)
+ytdl "https://example.com/file.torrent"                   # URL .torrent (auto-detectado)
+
+# Streams RTMP / RTSP
+ytdl "rtmp://live.example.com/stream/key"                 # stream RTMP en vivo
+ytdl "rtsp://camera.example.com/feed"                     # cámara RTSP
+ytdl --duration 60 "rtmp://..."                           # grabar 60 segundos
+
+# Analizador de sitios (cuando yt-dlp no puede obtener el medio)
+ytdl --analyze "https://example.com/page-with-video"      # forzar análisis de sitio
+
+# Forzar un backend específico
+ytdl --via torrent "magnet:?xt=..."
+ytdl --via stream "rtmp://..."
+ytdl --via ytdlp "https://..."
+
+# Pasar opciones directamente a yt-dlp
+ytdl "URL" -- --limit-rate 1M
 ```
 
 ## Opciones
@@ -86,10 +105,32 @@ ytdl "URL" -- --limit-rate 1M                                       # opciones d
 | `-b <navegador>` | Navegador para cookies | off |
 | `-n` | Sin cookies (predeterminado) | on |
 | `-i` | Solo información | off |
+| `-t` | Transcribir después de descargar | off |
+| `--backend <b>` | Backend de transcripción (local/api) | local |
+| `--manuscript <path>` | Ruta del manuscrito (para precisión) | - |
 | `--lang <code>` | Idioma (`ja`/`en`/`zh-Hans`/`es`/`hi`/`pt`/`id`) | `ja` |
+| `--via <backend>` | Especificar backend (ytdlp/torrent/stream/analyzer) | auto |
+| `--analyze` | Forzar modo analizador de sitios | off |
+| `--duration <seg>` | Duración de grabación de stream (segundos) | hasta detener |
 | `--` | Pasar a yt-dlp | - |
 
 Por defecto, ytdl se ejecuta sin cookies del navegador. Use `-b <navegador>` para contenido restringido (edad, membresía, etc.).
+
+## Arquitectura
+
+ytdl detecta automáticamente el backend correcto según el tipo de URL:
+
+```
+ytdl CLI
+  │
+  ├── magnet: / .torrent  → Backend Torrent (webtorrent P2P)
+  ├── rtmp:// / rtsp://   → Backend stream (ffmpeg spawn)
+  ├── flag --analyze      → Backend analizador de sitios (Chrome CDP)
+  └── http(s)://          → Backend yt-dlp (1000+ sitios)
+                               └── en fallo → fallback analizador
+```
+
+El backend yt-dlp envuelve `bin/ytdl.sh` (sin cambios desde v1). Los nuevos backends están completamente en `lib/backends/`.
 
 ## Salida
 
@@ -100,14 +141,15 @@ Por defecto, ytdl se ejecuta sin cookies del navegador. Use `-b <navegador>` par
           ├── Título.mp4
           ├── Título.jpg           # miniatura
           ├── Título.es.srt        # subtítulos
-          └── Título.description
+          ├── Título.description.txt
+          └── ytdl_20250226_1234.log
 ```
 
 ---
 
 ## Plugin de Claude Code
 
-Use ytdl como habilidad de Claude Code. Claude preguntará interactivamente qué descargar usando AskUserQuestion.
+Use ytdl como habilidad de Claude Code. Claude preguntará interactivamente qué descargar usando AskUserQuestion. Compatible con sitios de video, enlaces magnet, streams RTMP/RTSP y análisis de sitios.
 
 ### Instalación
 
@@ -118,14 +160,23 @@ Use ytdl como habilidad de Claude Code. Claude preguntará interactivamente qué
 
 ### Uso
 
-Pegue una URL de medios o diga "descarga esto" en cualquier conversación de Claude Code. La habilidad se activa automáticamente y:
+Pegue cualquier URL de medios (sitio de video, enlace magnet, URL de stream) o diga "descarga esto" en cualquier conversación de Claude Code. La habilidad se activa automáticamente y:
 
 1. Verifica si `ytdl` está instalado (propone instalar si falta)
-2. Obtiene información del medio
-3. Pregunta qué desea (video/audio, calidad, ubicación)
-4. Descarga el medio
+2. Detecta el tipo de URL y selecciona el backend apropiado
+3. Obtiene información del medio (cuando aplica)
+4. Pregunta qué desea (video/audio, calidad, ubicación)
+5. Descarga el medio
 
 ## Funciones IA
+
+### Detección universal de URL
+
+Solo pegue cualquier URL — ytdl enruta automáticamente al backend correcto:
+- YouTube, Vimeo, Twitter, etc. → yt-dlp
+- enlaces `magnet:` → Torrent (webtorrent)
+- `rtmp://`, `rtsp://` → captura de stream (ffmpeg)
+- página con video incrustado → analizador de sitios
 
 ### Análisis de URL de página
 
@@ -151,7 +202,7 @@ Pegue múltiples URLs a la vez. La IA pregunta sus preferencias (video/audio, ca
 Descarga estos:
 https://youtube.com/watch?v=aaa
 https://youtube.com/watch?v=bbb
-https://youtube.com/watch?v=ccc
+magnet:?xt=urn:btih:ccc
 ```
 
 ## Descargo de responsabilidad

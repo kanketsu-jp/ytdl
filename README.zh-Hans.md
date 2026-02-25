@@ -2,7 +2,7 @@
 
 > 🇺🇸 [English](./README.md) | 🇯🇵 [日本語](./README.ja.md) | 🇨🇳 **简体中文** | 🇪🇸 [Español](./README.es.md) | 🇮🇳 [हिन्दी](./README.hi.md) | 🇧🇷 [Português](./README.pt.md) | 🇮🇩 [Bahasa Indonesia](./README.id.md)
 
-基于 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 的媒体获取 CLI 工具。交互式 UI + AI 原生（Claude Code 插件）。
+面向开发者的通用媒体获取 CLI。支持通过 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 下载视频网站内容、Torrent（P2P）、RTMP/RTSP 流媒体等多种来源。交互式 UI + AI 原生（Claude Code 插件）。
 
 ## 合规与法律声明
 
@@ -66,13 +66,32 @@ ytdl
 ### 命令模式
 
 ```bash
-ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"                 # 最高画质 + 缩略图 + 字幕 + 描述
-ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"              # 仅音频 (m4a)
-ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc"          # 720p
-ytdl -p "https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf" # 播放列表
-ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"              # 仅信息
-ytdl -a -o ~/Music "https://www.youtube.com/watch?v=BaW_jenozKc"   # 音频保存到 ~/Music
-ytdl "URL" -- --limit-rate 1M                                       # 传递 yt-dlp 选项
+# 视频网站（yt-dlp，支持 1000+ 网站）
+ytdl "https://www.youtube.com/watch?v=BaW_jenozKc"        # 最高画质 + 缩略图 + 字幕 + 描述
+ytdl -a "https://www.youtube.com/watch?v=BaW_jenozKc"     # 仅音频 (m4a)
+ytdl -q 720 "https://www.youtube.com/watch?v=BaW_jenozKc" # 720p
+ytdl -p "https://www.youtube.com/playlist?list=..."        # 播放列表
+ytdl -i "https://www.youtube.com/watch?v=BaW_jenozKc"     # 仅信息（不下载）
+
+# Torrent / P2P
+ytdl "magnet:?xt=urn:btih:..."                            # 磁力链接（自动检测）
+ytdl "https://example.com/file.torrent"                   # .torrent URL（自动检测）
+
+# RTMP / RTSP 流媒体
+ytdl "rtmp://live.example.com/stream/key"                 # RTMP 直播
+ytdl "rtsp://camera.example.com/feed"                     # RTSP 摄像头
+ytdl --duration 60 "rtmp://..."                           # 录制 60 秒
+
+# 网站分析（当 yt-dlp 无法获取时）
+ytdl --analyze "https://example.com/page-with-video"      # 强制网站分析模式
+
+# 强制指定后端
+ytdl --via torrent "magnet:?xt=..."
+ytdl --via stream "rtmp://..."
+ytdl --via ytdlp "https://..."
+
+# 直接传递 yt-dlp 选项
+ytdl "URL" -- --limit-rate 1M
 ```
 
 ## 选项
@@ -86,10 +105,32 @@ ytdl "URL" -- --limit-rate 1M                                       # 传递 yt-
 | `-b <浏览器>` | Cookie 浏览器 | off |
 | `-n` | 不使用 Cookie（默认） | on |
 | `-i` | 仅信息 | off |
+| `-t` | 下载后转录 | off |
+| `--backend <b>` | 转录后端 (local/api) | local |
+| `--manuscript <path>` | 原稿文件路径（提高准确度） | - |
 | `--lang <code>` | 语言（`ja`/`en`/`zh-Hans`/`es`/`hi`/`pt`/`id`） | `ja` |
+| `--via <backend>` | 指定后端（ytdlp/torrent/stream/analyzer） | 自动 |
+| `--analyze` | 强制网站分析模式 | off |
+| `--duration <秒>` | 流媒体录制时长（秒） | 直到停止 |
 | `--` | 传递给 yt-dlp | - |
 
 默认不使用浏览器 Cookie。对于受限内容（年龄限制、会员专属等），请使用 `-b <浏览器>`。
+
+## 架构
+
+ytdl 根据 URL 类型自动选择合适的后端：
+
+```
+ytdl CLI
+  │
+  ├── magnet: / .torrent  → Torrent 后端（webtorrent P2P）
+  ├── rtmp:// / rtsp://   → 流媒体后端（ffmpeg spawn）
+  ├── --analyze 标志      → 网站分析后端（Chrome CDP）
+  └── http(s)://          → yt-dlp 后端（1000+ 网站）
+                               └── 失败时 → 网站分析兜底
+```
+
+yt-dlp 后端封装 `bin/ytdl.sh`（与 v1 相同）。新后端完全在 `lib/backends/` 中实现。
 
 ## 输出结构
 
@@ -100,14 +141,15 @@ ytdl "URL" -- --limit-rate 1M                                       # 传递 yt-
           ├── 标题.mp4
           ├── 标题.jpg           # 缩略图
           ├── 标题.zh-Hans.srt   # 字幕
-          └── 标题.description   # 描述
+          ├── 标题.description.txt   # 描述
+          └── ytdl_20250226_1234.log # 日志
 ```
 
 ---
 
 ## Claude Code 插件
 
-将 ytdl 作为 Claude Code 技能使用。Claude 会通过 AskUserQuestion 交互式确认下载内容。
+将 ytdl 作为 Claude Code 技能使用。Claude 会通过 AskUserQuestion 交互式确认下载内容。支持视频网站、磁力链接、RTMP/RTSP 流媒体和网站分析。
 
 ### 安装
 
@@ -118,14 +160,23 @@ ytdl "URL" -- --limit-rate 1M                                       # 传递 yt-
 
 ### 使用方法
 
-在 Claude Code 对话中粘贴媒体 URL 或说"下载这个"。技能会自动激活：
+在 Claude Code 对话中粘贴任意媒体 URL 或说"下载这个"。技能会自动激活：
 
 1. 检查 `ytdl` 是否已安装（未安装则提示安装）
-2. 获取媒体信息
-3. 询问您的需求（视频/音频、画质、保存位置）
-4. 执行下载
+2. 检测 URL 类型并选择合适的后端
+3. 获取媒体信息（如适用）
+4. 询问您的需求（视频/音频、画质、保存位置）
+5. 执行下载
 
 ## AI 功能
+
+### 通用 URL 检测
+
+直接粘贴任意 URL，ytdl 会自动路由到正确的后端：
+- YouTube、Vimeo、Twitter 等 → yt-dlp
+- `magnet:` 链接 → Torrent（webtorrent）
+- `rtmp://`、`rtsp://` → 流媒体抓取（ffmpeg）
+- 包含嵌入视频的页面 → 网站分析
 
 ### 页面URL分析
 
@@ -151,7 +202,7 @@ ytdl "URL" -- --limit-rate 1M                                       # 传递 yt-
 下载这些：
 https://youtube.com/watch?v=aaa
 https://youtube.com/watch?v=bbb
-https://youtube.com/watch?v=ccc
+magnet:?xt=urn:btih:ccc
 ```
 
 ## 免责声明

@@ -1116,12 +1116,15 @@ fi
 YT_ARGS+=(--write-description)
 
 # Output template
+# channel → uploader → webpage_url_domain の順にフォールバック
+# YouTube以外のサイトではchannelが空になるため、ドメイン名をディレクトリに使用
+CHANNEL_FIELD="%(channel,uploader,webpage_url_domain|unknown)s"
 if [[ "$PLAYLIST_MODE" == true ]]; then
   YT_ARGS+=(--yes-playlist)
-  OUTPUT_TEMPLATE="${BASE_DIR}/%(channel)s/%(playlist_title)s/%(playlist_index)03d_%(title)s/%(playlist_index)03d_%(title)s.%(ext)s"
+  OUTPUT_TEMPLATE="${BASE_DIR}/${CHANNEL_FIELD}/%(playlist_title)s/%(playlist_index)03d_%(title)s/%(playlist_index)03d_%(title)s.%(ext)s"
 else
   YT_ARGS+=(--no-playlist)
-  OUTPUT_TEMPLATE="${BASE_DIR}/%(channel)s/%(title)s/%(title)s.%(ext)s"
+  OUTPUT_TEMPLATE="${BASE_DIR}/${CHANNEL_FIELD}/%(title)s/%(title)s.%(ext)s"
 fi
 YT_ARGS+=(-o "$OUTPUT_TEMPLATE")
 
@@ -1228,11 +1231,30 @@ EXIT_CODE=${PIPESTATUS[0]}
 
 echo ""
 
-# --- Detect download directory ---
-if [[ "$PLAYLIST_MODE" == true ]]; then
-  DOWNLOAD_DIR=$(dirname "$(ls -td "${BASE_DIR}"/*/ 2>/dev/null | head -1)" 2>/dev/null || echo "")
-else
-  DOWNLOAD_DIR=$(dirname "$(ls -td "${BASE_DIR}"/*/*/ 2>/dev/null | head -1)" 2>/dev/null || echo "")
+# --- Detect download directory (find most recently modified media file) ---
+DOWNLOAD_DIR=""
+MEDIA_FILE=""
+_find_media() {
+  find "$1" -maxdepth 4 -type f \( -name "*.mp4" -o -name "*.webm" -o -name "*.mkv" -o -name "*.m4a" -o -name "*.mp3" -o -name "*.ts" \) -print0 2>/dev/null \
+    | xargs -0 ls -t 2>/dev/null | head -1 || true
+}
+MEDIA_FILE=$(_find_media "$BASE_DIR")
+if [[ -n "$MEDIA_FILE" ]]; then
+  DOWNLOAD_DIR=$(dirname "$MEDIA_FILE")
+fi
+
+# --- Rename .description → .description.txt ---
+if [[ -n "$DOWNLOAD_DIR" && -d "$DOWNLOAD_DIR" ]]; then
+  find "$DOWNLOAD_DIR" -name "*.description" -type f 2>/dev/null | while IFS= read -r desc_file; do
+    mv "$desc_file" "${desc_file}.txt"
+  done
+fi
+
+# --- Move log to download directory ---
+if [[ -n "$DOWNLOAD_DIR" && -d "$DOWNLOAD_DIR" && -f "$LOG_FILE" ]]; then
+  NEW_LOG_FILE="${DOWNLOAD_DIR}/$(basename "$LOG_FILE")"
+  mv "$LOG_FILE" "$NEW_LOG_FILE"
+  LOG_FILE="$NEW_LOG_FILE"
 fi
 
 # --- Show results ---
@@ -1253,20 +1275,24 @@ if [[ $EXIT_CODE -eq 0 ]]; then
   # --- Transcribe hook ---
   if [[ "$TRANSCRIBE" == "true" ]]; then
     echo "${W}  ${L_TRANSCRIBE_STARTING}${N}"
-    MEDIA_FILE=$(find "${DOWNLOAD_DIR:-$BASE_DIR}" -type f \( -name "*.mp4" -o -name "*.webm" -o -name "*.mkv" -o -name "*.m4a" -o -name "*.mp3" \) -maxdepth 3 2>/dev/null | head -1)
-    if [[ -n "$MEDIA_FILE" ]]; then
+    if [[ -n "$MEDIA_FILE" && -f "$MEDIA_FILE" ]]; then
       SCRIPT_DIR_ABS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
       MS_ARG=""
-      [[ -n "$TRANSCRIBE_MANUSCRIPT" ]] && MS_ARG="manuscript: '${TRANSCRIBE_MANUSCRIPT}',"
+      [[ -n "$TRANSCRIBE_MANUSCRIPT" ]] && MS_ARG="manuscript: process.env.YTDL_MANUSCRIPT,"
+      # ファイルパスの特殊文字を安全に渡すため環境変数を使用
+      YTDL_MEDIA_FILE="$MEDIA_FILE" \
+      YTDL_MANUSCRIPT="${TRANSCRIBE_MANUSCRIPT}" \
       node --input-type=module -e "
         import { transcribe } from '${SCRIPT_DIR_ABS}/../lib/transcribe.js';
-        transcribe('${MEDIA_FILE}', {
+        transcribe(process.env.YTDL_MEDIA_FILE, {
           backend: '${TRANSCRIBE_BACKEND}',
           language: '${LANG_CODE}',
           ${MS_ARG}
         }).then(() => console.log('${G}  ${L_TRANSCRIBE_DONE}${N}'))
           .catch(e => console.error('${R}  ${L_TRANSCRIBE_FAILED}${N}', e.message));
       " || true
+    else
+      echo "${Y}  ⚠ Media file not found for transcription${N}"
     fi
     echo ""
   fi

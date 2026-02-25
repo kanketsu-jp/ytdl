@@ -1,7 +1,7 @@
 {
   "name": "@kanketsu/ytdl",
-  "version": "1.5.1",
-  "description": "Developer-oriented media retrieval CLI with interactive UI (yt-dlp wrapper)",
+  "version": "2.0.0",
+  "description": "Universal media retrieval CLI — yt-dlp, torrent, RTMP/RTSP streams, site analyzer. Interactive UI + Claude Code plugin.",
   "bin": {
     "ytdl": "./cli.js"
   },
@@ -21,6 +21,10 @@
     "yt-dlp",
     "video",
     "audio",
+    "torrent",
+    "rtmp",
+    "rtsp",
+    "stream",
     "cli"
   ],
   "author": "kanketsu-jp",
@@ -36,6 +40,10 @@
   "dependencies": {
     "@clack/prompts": "^1.0.1",
     "picocolors": "^1.1.1"
+  },
+  "optionalDependencies": {
+    "webtorrent": "^2.5.0",
+    "ws": "^8.19.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
