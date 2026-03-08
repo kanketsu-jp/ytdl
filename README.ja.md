@@ -76,6 +76,7 @@ ytdl -i "https://example.com/watch?v=VIDEO_ID"     # 情報のみ（ダウンロ
 # Torrent / P2P
 ytdl "magnet:?xt=urn:btih:..."                            # マグネットリンク（自動検出）
 ytdl "https://example.com/file.torrent"                   # .torrent URL（自動検出）
+ytdl "./file.torrent"                                     # ローカル .torrent ファイル（自動検出）
 
 # RTMP / RTSP ストリーム
 ytdl "rtmp://live.example.com/stream/key"                 # RTMP ライブ配信
@@ -175,6 +176,7 @@ Claude Code の会話でメディアの URL を貼るか「ダウンロードし
 URLをそのまま貼るだけで、ytdl が自動的に適切なバックエンドにルーティングします:
 - 動画サイト（1000以上対応） → yt-dlp
 - `magnet:` リンク → Torrent（webtorrent）
+- `.torrent` ファイル（ローカルまたはURL） → Torrent（webtorrent）
 - `rtmp://`、`rtsp://` → ストリームキャプチャ（ffmpeg）
 - 動画が埋め込まれたページ → サイト解析
 

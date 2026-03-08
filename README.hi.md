@@ -76,6 +76,7 @@ ytdl -i "https://example.com/watch?v=VIDEO_ID"     # केवल जानक�
 # Torrent / P2P
 ytdl "magnet:?xt=urn:btih:..."                            # मैग्नेट लिंक (स्वतः पहचान)
 ytdl "https://example.com/file.torrent"                   # .torrent URL (स्वतः पहचान)
+ytdl "./file.torrent"                                     # स्थानीय .torrent फ़ाइल (स्वतः पहचान)
 
 # RTMP / RTSP स्ट्रीम
 ytdl "rtmp://live.example.com/stream/key"                 # RTMP लाइव स्ट्रीम
@@ -175,6 +176,7 @@ Claude Code की बातचीत में कोई भी मीडिय
 कोई भी URL पेस्ट करें — ytdl स्वतः सही बैकेंड पर रूट करता है:
 - वीडियो साइट्स (1000+ समर्थित) → yt-dlp
 - `magnet:` लिंक → Torrent (webtorrent)
+- `.torrent` फ़ाइल (स्थानीय या URL) → Torrent (webtorrent)
 - `rtmp://`, `rtsp://` → स्ट्रीम कैप्चर (ffmpeg)
 - एम्बेडेड वीडियो वाला पेज → साइट विश्लेषक
 

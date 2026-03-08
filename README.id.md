@@ -76,6 +76,7 @@ ytdl -i "https://example.com/watch?v=VIDEO_ID"     # info saja (tanpa unduh)
 # Torrent / P2P
 ytdl "magnet:?xt=urn:btih:..."                            # tautan magnet (auto-deteksi)
 ytdl "https://example.com/file.torrent"                   # URL .torrent (auto-deteksi)
+ytdl "./file.torrent"                                     # file .torrent lokal (auto-deteksi)
 
 # Stream RTMP / RTSP
 ytdl "rtmp://live.example.com/stream/key"                 # stream RTMP langsung
@@ -175,6 +176,7 @@ Tempel URL media apa pun (situs video, tautan magnet, URL stream) atau katakan "
 Cukup tempel URL apa pun — ytdl secara otomatis merutekan ke backend yang benar:
 - Situs video (1000+ didukung) → yt-dlp
 - tautan `magnet:` → Torrent (webtorrent)
+- file `.torrent` (lokal atau URL) → Torrent (webtorrent)
 - `rtmp://`, `rtsp://` → capture stream (ffmpeg)
 - halaman dengan video tertanam → penganalisis situs
 

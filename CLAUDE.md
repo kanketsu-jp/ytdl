@@ -14,6 +14,7 @@ lib/
   i18n.js                       # i18n (ja/en/zh-Hans/es/hi/pt/id), language detection
   transcribe.js                 # Transcription core (local mlx-whisper / OpenAI API)
   spec-check.js                 # Machine spec check (Apple Silicon / memory, cached)
+  update-check.js               # npm registry update checker (file-cached, 1 day interval)
   router.js                     # URL router: detects backend from URL type
   backends/
     index.js                    # Backend registry & export
@@ -38,7 +39,7 @@ skills/
 
 **URL Routing:**
 - `http(s)://` → yt-dlp backend (1000+ sites via yt-dlp)
-- `magnet:` / `.torrent` → torrent backend (webtorrent)
+- `magnet:` / `.torrent` (URL or local file) → torrent backend (webtorrent)
 - `rtmp://` / `rtsp://` → stream backend (ffmpeg)
 - `--analyze` flag → site analyzer backend (Chrome CDP)
 - yt-dlp failure → optional fallback to site analyzer

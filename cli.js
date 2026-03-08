@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import * as p from "@clack/prompts";
@@ -11,8 +12,14 @@ import { t, currentLang } from "./lib/i18n.js";
 import { routeUrl } from "./lib/router.js";
 import { getBackend, getBackendByName, getAvailableBackend } from "./lib/backends/index.js";
 import { maybeOpenDir } from "./lib/open-dir.js";
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const require = createRequire(import.meta.url);
+const pkg = require("./package.json");
+
+// --- Update check (non-blocking, file-cached, 1 day interval) ---
+import { checkForUpdate } from "./lib/update-check.js";
+const updateMsg = await checkForUpdate(pkg);
+if (updateMsg) process.on("exit", () => { console.error(updateMsg); });
 const SCRIPT = path.join(__dirname, "bin", "ytdl.sh");
 
 // --- Strip --lang, transcribe, routing options from argv before passing to bash ---
@@ -51,7 +58,18 @@ for (let i = 0; i < rawArgv.length; i++) {
 if (argv.includes("-h") || argv.includes("--help")) {
   spawn("bash", [SCRIPT, "-h", "--lang", currentLang], { stdio: "inherit" }).on(
     "close",
-    (c) => process.exit(c ?? 0)
+    (c) => {
+      // Show URL types section (handled by Node.js, not bash)
+      console.log("");
+      console.log(`  \x1b[1;37m${t.helpUrlTypesHeader}\x1b[0m`);
+      console.log(`  \x1b[32mhttp(s)://\x1b[0m          \x1b[2m→ yt-dlp (1000+ ${t.helpUrlTypesSites})\x1b[0m`);
+      console.log(`  \x1b[32mmagnet:\x1b[0m             \x1b[2m→ Torrent (webtorrent P2P)\x1b[0m`);
+      console.log(`  \x1b[32m*.torrent\x1b[0m           \x1b[2m→ Torrent (${t.helpUrlTypesTorrentFile})\x1b[0m`);
+      console.log(`  \x1b[32mrtmp(s)://\x1b[0m          \x1b[2m→ ${t.helpUrlTypesStream} (ffmpeg)\x1b[0m`);
+      console.log(`  \x1b[32mrtsp://\x1b[0m             \x1b[2m→ ${t.helpUrlTypesStream} (ffmpeg)\x1b[0m`);
+      console.log("");
+      process.exit(c ?? 0);
+    }
   );
 } else if (argv.length > 0) {
   // Has arguments — route to appropriate backend

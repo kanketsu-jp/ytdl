@@ -1,6 +1,6 @@
 ---
 name: download
-description: "Universal media retrieval via ytdl. Activates when the user shares any media URL (video sites, magnet links, RTMP/RTSP streams, or any web page), asks to download media, extract audio, or get media info. Also handles torrent downloads, live stream recording, and site analysis for pages without direct video URLs. Activates when the user asks about ytdl usage, options, features, or capabilities."
+description: "Universal media retrieval via ytdl. Activates when the user shares any media URL (video sites, magnet links, .torrent files, RTMP/RTSP streams, or any web page), asks to download media, extract audio, or get media info. Also handles torrent downloads (including local .torrent files), live stream recording, and site analysis for pages without direct video URLs. Activates when the user asks about ytdl usage, options, features, or capabilities."
 allowed-tools: Bash, AskUserQuestion, WebFetch
 ---
 
@@ -50,9 +50,10 @@ Suggest `brew install yt-dlp ffmpeg` if missing.
 
 Collect all URLs from the user's message and classify each:
 
-**Torrent (magnet: or .torrent URL):**
+**Torrent (magnet:, .torrent URL, or local .torrent file):**
 - `magnet:?xt=...` → torrent backend (auto-detected by ytdl)
 - `https://...file.torrent` → torrent backend (auto-detected by ytdl)
+- `/path/to/file.torrent` or `./file.torrent` → torrent backend (local .torrent file, auto-detected by ytdl)
 - No further classification needed — proceed to Step 3 (skip info fetch)
 
 **Stream (RTMP/RTSP):**
@@ -164,6 +165,8 @@ ytdl -p "URL"
 ```bash
 ytdl "magnet:?xt=urn:btih:..."
 ytdl "https://example.com/file.torrent"
+ytdl "/path/to/file.torrent"        # local .torrent file
+ytdl "./file.torrent"               # relative path
 ytdl -o ~/Downloads "magnet:?xt=..."
 ```
 
@@ -241,10 +244,11 @@ ytdl [options] <URL>
 --                   pass remaining args to yt-dlp
 
 URL types:
-  http(s)://  → yt-dlp (auto, 1000+ sites)
-  magnet:     → torrent backend (webtorrent P2P)
-  rtmp(s)://  → stream backend (ffmpeg)
-  rtsp://     → stream backend (ffmpeg)
+  http(s)://         → yt-dlp (auto, 1000+ sites)
+  magnet:            → torrent backend (webtorrent P2P)
+  *.torrent (file)   → torrent backend (local/remote .torrent file)
+  rtmp(s)://         → stream backend (ffmpeg)
+  rtsp://            → stream backend (ffmpeg)
 ```
 
 Output structure: `{dir}/{channel}/{title}/{title}.{ext}`

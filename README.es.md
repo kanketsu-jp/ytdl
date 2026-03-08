@@ -76,6 +76,7 @@ ytdl -i "https://example.com/watch?v=VIDEO_ID"     # solo información (sin desc
 # Torrent / P2P
 ytdl "magnet:?xt=urn:btih:..."                            # enlace magnet (auto-detectado)
 ytdl "https://example.com/file.torrent"                   # URL .torrent (auto-detectado)
+ytdl "./file.torrent"                                     # archivo .torrent local (auto-detectado)
 
 # Streams RTMP / RTSP
 ytdl "rtmp://live.example.com/stream/key"                 # stream RTMP en vivo
@@ -175,6 +176,7 @@ Pegue cualquier URL de medios (sitio de video, enlace magnet, URL de stream) o d
 Solo pegue cualquier URL — ytdl enruta automáticamente al backend correcto:
 - Sitios de video (1000+ compatibles) → yt-dlp
 - enlaces `magnet:` → Torrent (webtorrent)
+- archivos `.torrent` (local o URL) → Torrent (webtorrent)
 - `rtmp://`, `rtsp://` → captura de stream (ffmpeg)
 - página con video incrustado → analizador de sitios
 

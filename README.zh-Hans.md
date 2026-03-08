@@ -76,6 +76,7 @@ ytdl -i "https://example.com/watch?v=VIDEO_ID"     # 仅信息（不下载）
 # Torrent / P2P
 ytdl "magnet:?xt=urn:btih:..."                            # 磁力链接（自动检测）
 ytdl "https://example.com/file.torrent"                   # .torrent URL（自动检测）
+ytdl "./file.torrent"                                     # 本地 .torrent 文件（自动检测）
 
 # RTMP / RTSP 流媒体
 ytdl "rtmp://live.example.com/stream/key"                 # RTMP 直播
@@ -175,6 +176,7 @@ yt-dlp 后端封装 `bin/ytdl.sh`（与 v1 相同）。新后端完全在 `lib/b
 直接粘贴任意 URL，ytdl 会自动路由到正确的后端：
 - 视频网站（支持 1000+ 站点） → yt-dlp
 - `magnet:` 链接 → Torrent（webtorrent）
+- `.torrent` 文件（本地或 URL） → Torrent（webtorrent）
 - `rtmp://`、`rtsp://` → 流媒体抓取（ffmpeg）
 - 包含嵌入视频的页面 → 网站分析
 
