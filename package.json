@@ -1,6 +1,6 @@
 {
   "name": "@kanketsu/ytdl",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Universal media retrieval CLI — yt-dlp, torrent, RTMP/RTSP streams, site analyzer. Interactive UI + Claude Code plugin.",
   "bin": {
     "ytdl": "./cli.js"
