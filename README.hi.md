@@ -86,6 +86,9 @@ ytdl --duration 60 "rtmp://..."                           # 60 सेकंड �
 # साइट विश्लेषक (जब yt-dlp विफल हो)
 ytdl --analyze "https://example.com/page-with-video"      # साइट विश्लेषण मोड बाध्य करें
 
+# गुमनाम मोड (तारीख-आधारित फ़ाइल नाम, चैनल/शीर्षक नहीं)
+ytdl --anon "https://example.com/watch?v=VIDEO_ID"
+
 # विशिष्ट बैकेंड बाध्य करें
 ytdl --via torrent "magnet:?xt=..."
 ytdl --via stream "rtmp://..."
@@ -113,6 +116,7 @@ ytdl "URL" -- --limit-rate 1M
 | `--via <backend>` | बैकेंड निर्दिष्ट करें (ytdlp/torrent/stream/analyzer) | स्वतः |
 | `--analyze` | साइट विश्लेषक मोड बाध्य करें | off |
 | `--duration <सेकंड>` | स्ट्रीम रिकॉर्डिंग अवधि (सेकंड) | रोकने तक |
+| `--anon` | गुमनाम मोड (तारीख-आधारित फ़ाइल नाम) | off |
 | `--` | yt-dlp को पास करें | - |
 
 डिफ़ॉल्ट रूप से, ytdl ब्राउज़र कुकी का उपयोग नहीं करता। प्रतिबंधित कंटेंट (आयु सीमा, सदस्य-केवल आदि) के लिए `-b <ब्राउज़र>` का उपयोग करें।

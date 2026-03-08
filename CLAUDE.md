@@ -75,6 +75,7 @@ ytdl [options] <URL> [-- yt-dlp-options...]
 --via <backend>      force download backend (ytdlp/torrent/stream/analyzer)
 --analyze            force site analyzer mode
 --duration <sec>     stream recording duration (seconds)
+--anon            anonymous mode (date-based filenames)
 --            pass remaining to yt-dlp
 
 URL types:
@@ -88,6 +89,8 @@ URL types:
 
 - Single: `{base}/{channel}/{title}/{title}.{ext}`
 - Playlist: `{base}/{channel}/{playlist}/{NNN}_{title}/{NNN}_{title}.{ext}`
+- Anonymous: `{base}/{YYYYMMDD}/{HHMMSS_001}/{HHMMSS_001}.{ext}`
+- Anonymous+Playlist: `{base}/{YYYYMMDD}/{HHMMSS_NNN}/{HHMMSS_NNN}.{ext}`
 
 ## Demo Directory
 

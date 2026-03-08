@@ -52,6 +52,7 @@ case "$LANG_CODE" in
     L_OPT_S="Subtitle languages (e.g. ja,en)"
     L_OPT_I="Show info only (no download)"
     L_OPT_H="Show this help"
+    L_OPT_ANON="Anonymous mode (date-based filenames)"
     L_OPT_PASS="Pass remaining args to yt-dlp"
     L_EXAMPLES="Examples:"
     L_EX_BEST="# Best quality, full download"
@@ -136,6 +137,7 @@ case "$LANG_CODE" in
     L_OPT_S="字幕语言（例：zh-Hans,en）"
     L_OPT_I="仅显示信息（不下载）"
     L_OPT_H="显示此帮助"
+    L_OPT_ANON="匿名模式（基于日期的文件名）"
     L_OPT_PASS="将剩余参数传递给 yt-dlp"
     L_EXAMPLES="示例："
     L_EX_BEST="# 最高画质，完整下载"
@@ -220,6 +222,7 @@ case "$LANG_CODE" in
     L_OPT_S="Idiomas de subtítulos (ej: es,en)"
     L_OPT_I="Solo información (sin descarga)"
     L_OPT_H="Mostrar esta ayuda"
+    L_OPT_ANON="Modo anónimo (nombres basados en fecha)"
     L_OPT_PASS="Pasar argumentos restantes a yt-dlp"
     L_EXAMPLES="Ejemplos:"
     L_EX_BEST="# Mejor calidad, descarga completa"
@@ -304,6 +307,7 @@ case "$LANG_CODE" in
     L_OPT_S="उपशीर्षक भाषाएँ (उदा: hi,en)"
     L_OPT_I="केवल जानकारी (डाउनलोड नहीं)"
     L_OPT_H="यह सहायता दिखाएँ"
+    L_OPT_ANON="गुमनाम मोड (तारीख-आधारित फ़ाइल नाम)"
     L_OPT_PASS="शेष args को yt-dlp को पास करें"
     L_EXAMPLES="उदाहरण:"
     L_EX_BEST="# सर्वश्रेष्ठ गुणवत्ता, पूर्ण डाउनलोड"
@@ -388,6 +392,7 @@ case "$LANG_CODE" in
     L_OPT_S="Idiomas de legendas (ex: pt,en)"
     L_OPT_I="Apenas informações (sem download)"
     L_OPT_H="Mostrar esta ajuda"
+    L_OPT_ANON="Modo anônimo (nomes baseados em data)"
     L_OPT_PASS="Passar argumentos restantes ao yt-dlp"
     L_EXAMPLES="Exemplos:"
     L_EX_BEST="# Melhor qualidade, download completo"
@@ -472,6 +477,7 @@ case "$LANG_CODE" in
     L_OPT_S="Bahasa subtitle (contoh: id,en)"
     L_OPT_I="Tampilkan info saja (tanpa unduhan)"
     L_OPT_H="Tampilkan bantuan ini"
+    L_OPT_ANON="Mode anonim (nama file berbasis tanggal)"
     L_OPT_PASS="Teruskan argumen ke yt-dlp"
     L_EXAMPLES="Contoh:"
     L_EX_BEST="# Kualitas terbaik, unduh lengkap"
@@ -556,6 +562,7 @@ case "$LANG_CODE" in
     L_OPT_S="字幕言語（例: ja,en）"
     L_OPT_I="動画情報のみ表示（DLしない）"
     L_OPT_H="このヘルプを表示"
+    L_OPT_ANON="匿名モード（日付ベースのファイル名）"
     L_OPT_PASS="以降を yt-dlp に直接渡す"
     L_EXAMPLES="例:"
     L_EX_BEST="# 最高画質で全部入りDL"
@@ -906,6 +913,7 @@ show_help() {
   echo "  ${G}-t${N}             ${L_OPT_TRANSCRIBE}"
   echo "  ${G}--backend${N} <b>  ${L_OPT_BACKEND}  ${D}[local]${N}"
   echo "  ${G}--manuscript${N} <path>  ${L_OPT_MANUSCRIPT}"
+  echo "  ${G}--anon${N}          ${L_OPT_ANON}"
   echo "  ${G}-h${N}             ${L_OPT_H}"
   echo "  ${G}--${N}             ${L_OPT_PASS}"
   echo ""
@@ -932,6 +940,7 @@ URL=""
 TRANSCRIBE=false
 TRANSCRIBE_BACKEND="local"
 TRANSCRIBE_MANUSCRIPT=""
+ANON_MODE=false
 EXTRA_ARGS=()
 
 # --- Parse options ---
@@ -981,6 +990,7 @@ while [[ $# -gt 0 ]]; do
         echo "${R}--manuscript requires a value${N}"; exit 1
       fi
       TRANSCRIBE_MANUSCRIPT="$2"; shift 2 ;;
+    --anon) ANON_MODE=true; shift ;;
     -h|--help) show_help; exit 0 ;;
     --)
       shift
@@ -1116,15 +1126,27 @@ fi
 YT_ARGS+=(--write-description)
 
 # Output template
-# channel → uploader → webpage_url_domain の順にフォールバック
-# YouTube以外のサイトではchannelが空になるため、ドメイン名をディレクトリに使用
-CHANNEL_FIELD="%(channel,uploader,webpage_url_domain|unknown)s"
-if [[ "$PLAYLIST_MODE" == true ]]; then
-  YT_ARGS+=(--yes-playlist)
-  OUTPUT_TEMPLATE="${BASE_DIR}/${CHANNEL_FIELD}/%(playlist_title)s/%(playlist_index)03d_%(title)s/%(playlist_index)03d_%(title)s.%(ext)s"
+if [[ "$ANON_MODE" == true ]]; then
+  ANON_DATE=$(date +%Y%m%d)
+  ANON_TIME=$(date +%H%M%S)
+  if [[ "$PLAYLIST_MODE" == true ]]; then
+    YT_ARGS+=(--yes-playlist)
+    OUTPUT_TEMPLATE="${BASE_DIR}/${ANON_DATE}/${ANON_TIME}_%(playlist_index)03d/${ANON_TIME}_%(playlist_index)03d.%(ext)s"
+  else
+    YT_ARGS+=(--no-playlist)
+    OUTPUT_TEMPLATE="${BASE_DIR}/${ANON_DATE}/${ANON_TIME}_001/${ANON_TIME}_001.%(ext)s"
+  fi
 else
-  YT_ARGS+=(--no-playlist)
-  OUTPUT_TEMPLATE="${BASE_DIR}/${CHANNEL_FIELD}/%(title)s/%(title)s.%(ext)s"
+  # channel → uploader → webpage_url_domain の順にフォールバック
+  # YouTube以外のサイトではchannelが空になるため、ドメイン名をディレクトリに使用
+  CHANNEL_FIELD="%(channel,uploader,webpage_url_domain|unknown)s"
+  if [[ "$PLAYLIST_MODE" == true ]]; then
+    YT_ARGS+=(--yes-playlist)
+    OUTPUT_TEMPLATE="${BASE_DIR}/${CHANNEL_FIELD}/%(playlist_title)s/%(playlist_index)03d_%(title)s/%(playlist_index)03d_%(title)s.%(ext)s"
+  else
+    YT_ARGS+=(--no-playlist)
+    OUTPUT_TEMPLATE="${BASE_DIR}/${CHANNEL_FIELD}/%(title)s/%(title)s.%(ext)s"
+  fi
 fi
 YT_ARGS+=(-o "$OUTPUT_TEMPLATE")
 

@@ -86,6 +86,9 @@ ytdl --duration 60 "rtmp://..."                           # 60秒録画
 # サイト解析（yt-dlp で取得できない場合）
 ytdl --analyze "https://example.com/page-with-video"      # サイト解析モードを強制
 
+# 匿名モード（日付ベースのファイル名、チャンネル名・タイトルなし）
+ytdl --anon "https://example.com/watch?v=VIDEO_ID"
+
 # バックエンドを強制指定
 ytdl --via torrent "magnet:?xt=..."
 ytdl --via stream "rtmp://..."
@@ -113,6 +116,7 @@ ytdl "URL" -- --limit-rate 1M
 | `--via <backend>` | バックエンド指定（ytdlp/torrent/stream/analyzer） | 自動 |
 | `--analyze` | サイト解析モードを強制 | off |
 | `--duration <秒>` | ストリーム録画時間（秒） | 停止まで |
+| `--anon` | 匿名モード（日付ベースのファイル名） | off |
 | `--` | 以降をyt-dlpに渡す | - |
 
 デフォルトではブラウザのクッキーを使いません。制限付きコンテンツ（年齢制限、メンバー限定等）には `-b <ブラウザ>` を使用してください。

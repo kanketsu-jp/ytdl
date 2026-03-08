@@ -241,6 +241,7 @@ ytdl [options] <URL>
 --via <backend>      force backend (ytdlp/torrent/stream/analyzer)
 --analyze            force site analyzer mode
 --duration <sec>     stream recording duration (seconds)
+--anon               anonymous mode (date-based filenames)
 --                   pass remaining args to yt-dlp
 
 URL types:
@@ -251,7 +252,7 @@ URL types:
   rtsp://            → stream backend (ffmpeg)
 ```
 
-Output structure: `{dir}/{channel}/{title}/{title}.{ext}`
+Output structure: `{dir}/{channel}/{title}/{title}.{ext}` (anonymous: `{dir}/{YYYYMMDD}/{HHMMSS_NNN}/{HHMMSS_NNN}.{ext}`)
 
 ## Important rules
 

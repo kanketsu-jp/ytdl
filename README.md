@@ -86,6 +86,9 @@ ytdl --duration 60 "rtmp://..."                           # record 60 seconds
 # Site analyzer (when yt-dlp can't find the media)
 ytdl --analyze "https://example.com/page-with-video"      # force site analysis
 
+# Anonymous mode (date-based filenames, no channel/title)
+ytdl --anon "https://example.com/watch?v=VIDEO_ID"
+
 # Force a specific backend
 ytdl --via torrent "magnet:?xt=..."
 ytdl --via stream "rtmp://..."
@@ -113,6 +116,7 @@ ytdl "URL" -- --limit-rate 1M
 | `--via <backend>` | Force backend (ytdlp/torrent/stream/analyzer) | auto |
 | `--analyze` | Force site analyzer mode | off |
 | `--duration <sec>` | Stream recording duration (seconds) | until stopped |
+| `--anon` | Anonymous mode (date-based filenames) | off |
 | `--` | Pass remaining args to yt-dlp | - |
 
 By default, ytdl runs without browser cookies. Use `-b <browser>` for restricted content (age-restricted, member-only, etc.).

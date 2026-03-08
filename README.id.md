@@ -86,6 +86,9 @@ ytdl --duration 60 "rtmp://..."                           # rekam 60 detik
 # Penganalisis situs (ketika yt-dlp tidak dapat memperoleh media)
 ytdl --analyze "https://example.com/page-with-video"      # paksa mode analisis situs
 
+# Mode anonim (nama file berbasis tanggal, tanpa channel/judul)
+ytdl --anon "https://example.com/watch?v=VIDEO_ID"
+
 # Paksa backend tertentu
 ytdl --via torrent "magnet:?xt=..."
 ytdl --via stream "rtmp://..."
@@ -113,6 +116,7 @@ ytdl "URL" -- --limit-rate 1M
 | `--via <backend>` | Tentukan backend (ytdlp/torrent/stream/analyzer) | otomatis |
 | `--analyze` | Paksa mode penganalisis situs | off |
 | `--duration <detik>` | Durasi rekaman stream (detik) | sampai dihentikan |
+| `--anon` | Mode anonim (nama file berbasis tanggal) | off |
 | `--` | Teruskan ke yt-dlp | - |
 
 Secara default, ytdl berjalan tanpa cookie browser. Gunakan `-b <browser>` untuk konten terbatas (batasan usia, khusus member, dll.).

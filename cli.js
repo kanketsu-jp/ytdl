@@ -28,6 +28,7 @@ const argv = [];
 let viaBackend = null;    // --via <name> で手動指定されたバックエンド名
 let forceAnalyze = false; // --analyze フラグ
 let duration = null;      // --duration <sec> ストリーム録画時間
+let anonMode = false;     // --anon 匿名モード
 for (let i = 0; i < rawArgv.length; i++) {
   if (rawArgv[i] === "--lang") {
     i++; // skip value
@@ -50,6 +51,12 @@ for (let i = 0; i < rawArgv.length; i++) {
   // --duration <sec>: ストリーム録画時間（秒）
   if (rawArgv[i] === "--duration") {
     duration = parseInt(rawArgv[++i], 10) || null;
+    continue;
+  }
+  // --anon: 匿名モード（argv にも残す：bin/ytdl.sh に渡すため）
+  if (rawArgv[i] === "--anon") {
+    anonMode = true;
+    argv.push(rawArgv[i]);
     continue;
   }
   argv.push(rawArgv[i]);
@@ -90,7 +97,7 @@ if (argv.includes("-h") || argv.includes("--help")) {
       if (backend) {
         const depsOk = await backend.checkDeps();
         if (!depsOk) process.exit(1);
-        const result = await backend.download(urlArg, { args: argv, duration });
+        const result = await backend.download(urlArg, { args: argv, duration, anon: anonMode, outputDir: cliOutputDir });
         if (result.code === 0) await onDownloadSuccess(cliOutputDir);
         process.exit(result.code ?? 0);
         return;
@@ -103,7 +110,7 @@ if (argv.includes("-h") || argv.includes("--help")) {
       if (backend) {
         const depsOk = await backend.checkDeps();
         if (!depsOk) process.exit(1);
-        const result = await backend.download(urlArg, { args: argv, duration });
+        const result = await backend.download(urlArg, { args: argv, duration, anon: anonMode, outputDir: cliOutputDir });
         if (result.code === 0) await onDownloadSuccess(cliOutputDir);
         process.exit(result.code ?? 0);
         return;
@@ -119,7 +126,7 @@ if (argv.includes("-h") || argv.includes("--help")) {
           // 依存パッケージが未インストールならインストールを尋ねる
           const depsOk = await backend.checkDeps();
           if (depsOk) {
-            const result = await backend.download(urlArg, { args: argv, duration });
+            const result = await backend.download(urlArg, { args: argv, duration, anon: anonMode, outputDir: cliOutputDir });
             if (result.code === 0) await onDownloadSuccess(cliOutputDir);
             process.exit(result.code ?? 0);
             return;
@@ -195,7 +202,7 @@ async function run() {
       p.outro(pc.yellow("webtorrent が未インストールのため中止しました"));
       process.exit(1);
     }
-    const result = await backend.download(opts.url, { outputDir: opts.outputDir });
+    const result = await backend.download(opts.url, { outputDir: opts.outputDir, anon: opts.anon });
     if (result.code === 0) await onDownloadSuccess(opts.outputDir);
     p.outro(result.code === 0 ? pc.green(t.done) : pc.red(`${t.exitedWithCode} ${result.code}`));
     process.exit(result.code ?? 0);

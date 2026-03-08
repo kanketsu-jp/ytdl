@@ -86,6 +86,9 @@ ytdl --duration 60 "rtmp://..."                           # 录制 60 秒
 # 网站分析（当 yt-dlp 无法获取时）
 ytdl --analyze "https://example.com/page-with-video"      # 强制网站分析模式
 
+# 匿名模式（基于日期的文件名，无频道名/标题）
+ytdl --anon "https://example.com/watch?v=VIDEO_ID"
+
 # 强制指定后端
 ytdl --via torrent "magnet:?xt=..."
 ytdl --via stream "rtmp://..."
@@ -113,6 +116,7 @@ ytdl "URL" -- --limit-rate 1M
 | `--via <backend>` | 指定后端（ytdlp/torrent/stream/analyzer） | 自动 |
 | `--analyze` | 强制网站分析模式 | off |
 | `--duration <秒>` | 流媒体录制时长（秒） | 直到停止 |
+| `--anon` | 匿名模式（基于日期的文件名） | off |
 | `--` | 传递给 yt-dlp | - |
 
 默认不使用浏览器 Cookie。对于受限内容（年龄限制、会员专属等），请使用 `-b <浏览器>`。
