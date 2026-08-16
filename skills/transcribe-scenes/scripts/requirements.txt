@@ -1,0 +1,5 @@
+numpy
+resemblyzer
+scikit-learn
+setuptools<81
+webrtcvad

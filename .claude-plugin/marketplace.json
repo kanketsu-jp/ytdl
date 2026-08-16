@@ -10,9 +10,19 @@
     {
       "name": "ytdl",
       "source": "./",
-      "description": "Media retrieval skill. Retrieves video/audio, extracts audio, shows media info with interactive prompts.",
-      "version": "1.3.0",
-      "keywords": ["media", "retrieval", "video", "audio", "yt-dlp"]
+      "description": "Media retrieval skill. Retrieves video/audio, extracts audio, shows media info with interactive prompts Also transcribes video into speaker-labelled text, subtitles and scene images.",
+      "version": "1.4.0",
+      "keywords": [
+        "audio",
+        "diarization",
+        "media",
+        "retrieval",
+        "subtitles",
+        "transcription",
+        "video",
+        "whisper",
+        "yt-dlp"
+      ]
     }
   ]
 }
